@@ -63,8 +63,8 @@ class wsafip_service(osv.osv):
     _columns = {
         'name': fields.char('Name', size=64),
         'partner': fields.many2one('res.partner', 'Partner'),
-        'certfile': field.many2one('ir.attachment', 'Certification File')
-        'keyfile': field.many2one('ir.attachment', 'Key File')
+        'certfile': field.many2one('ir.attachment', 'Certification File'),
+        'keyfile': field.many2one('ir.attachment', 'Key File'),
         'uniqueId': fields.integer('Unique ID'),
         'service': fields.many2one('wsafip.service', 'Service'),
         'token': fields.char('Token', size=512),
