@@ -33,12 +33,18 @@ Incluye:
  - API para realizar consultas en la Web Services desde OpenERP.
 
 El módulo l10n_ar_wsafip permite a OpenERP acceder a los servicios del AFIP a través de Web Services. Este módulo es un servicio para administradores y programadores, donde podrán configurar el servidor, la autentificación y además tendrán acceso a una API genérica en Python para utilizar los servicios AFIP.
+
+Para poder ejecutar los tests es necesario cargar la clave privada y el certificado al archivo test_key.yml. Tenga en cuenta que estas claves son personales y pueden traer conflicto publicarlas en los repositorios públicos.
 """,
     'depends': [
+        'crypto',
     ],
     'init_xml': [],
     'demo_xml': [],
     'test': [
+        'test/test_key.yml',
+        'test/test_mime_signer.yml',
+        'test/test_wsafip_service.yml',
     ],
     'update_xml': [
     ],

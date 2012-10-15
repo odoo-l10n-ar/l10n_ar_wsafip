@@ -1,0 +1,37 @@
+-
+ In order to test afip webservices setup Moldeo Interactive FE
+-
+  !record {model: res.partner, id: ctmil_ar_0}:
+    name: CT Moldeo Interactive L
+    vat: ar30712007288
+
+-
+ In order to test afip webservices append FE service
+-
+  !record {model: wsafip.service, id: wsfe_ar_0}:
+    name: Factura Electronica
+    code: wsfe
+
+-
+ In order to test afip webservices append an FE service instance
+-
+  !record {model: wsafip.authorization, id: authorization_ar_0}:
+    name: Moldeo Interactive FE
+    partner_id: ctmil_ar_0
+    service: wsfe_ar_0
+    certificate: cert_ar_0
+    url: https://wsaahomo.afip.gov.ar/ws/services/LoginCms
+
+-
+ Now test login
+-
+  !python {model: wsafip.authorization}: |
+       A = self.browse(cr, uid, ref('authorization_ar_0'))
+       A.login()
+
+-
+ Check login result
+-
+  !assert {model: wsafip.authorization, id: authorization_ar_0, string: Wrong authorization}:
+        - status == 'Connected'
+

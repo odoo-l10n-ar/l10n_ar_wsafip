@@ -19,26 +19,24 @@
 #
 ##############################################################################
 from osv import fields, osv
-from signer import Signer
 from stub.LoginCMSService_types import *
 from stub.LoginCMSService_client import *
-from rand import randint
+from random import randint
 import xml.etree.ElementTree as ET
 from dateutil.parser import parse as dateparse
 from dateutil.tz import tzlocal
-from firmante import Firmante
+from datetime import datetime, timedelta
 
 _login_message="""\
 <?xml version="1.0" encoding="UTF-8"?>
 <loginTicketRequest version="1.0">
 <header>
-    <uniqueId>{uniqueId}</uniqueId>
-    <generationTime>{generationTime}</generationTime>
-    <expirationTime>{expirationTime}</expirationTime>
+    <uniqueId>{uniqueid}</uniqueId>
+    <generationTime>{generationtime}</generationTime>
+    <expirationTime>{expirationtime}</expirationTime>
 </header>
 <service>{service}</service>
-</loginTicketRequest>
-"""
+</loginTicketRequest>"""
 
 class wsafip_service(osv.osv):
     _name = "wsafip.service"
@@ -46,85 +44,91 @@ class wsafip_service(osv.osv):
         'name': fields.char('Name', size=64),
         'code': fields.char('Code', size=16)
     }
+wsafip_service()
 
-class wsafip_service(osv.osv):
+class wsafip_authorization(osv.osv):
     def _get_status(self, cr, uid, ids, fields_name, arg, context=None):
-        if None in (self.uniqueId, self.generationTime, self.expirationTime, self.token, self.sign):
-            return 'Disconnected'
-        elif datetime.now(tzlocal()) < self.generationTime - timedelta(0,1):
-            return 'Shifted Clock'
-        elif datetime.now(tzlocal()) < self.expirationTime:
-            return 'Connected'
-        else:
-            return 'Invalid'
-        # 'Invalid Partner' si el cuit del partner no es el mismo al de la clave publica/privada.
+        r = {}
+        for auth in self.browse(cr, uid, ids):
+            if False in (auth.uniqueid, auth.generationtime, auth.expirationtime, auth.token, auth.sign):
+                r[auth.id]='Disconnected'
+            elif dateparse(auth.generationtime) - timedelta(0,1) < datetime.now() :
+                r[auth.id]='Shifted Clock'
+            elif datetime.now() < dateparse(auth.expirationtime):
+                r[auth.id]='Connected'
+            else:
+                r[auth.id]='Invalid'
+            # 'Invalid Partner' si el cuit del partner no es el mismo al de la clave publica/privada.
+        return r
 
     _name = "wsafip.authorization"
     _columns = {
         'name': fields.char('Name', size=64),
-        'partner': fields.many2one('res.partner', 'Partner'),
-        'certfile': field.many2one('ir.attachment', 'Certification File'),
-        'keyfile': field.many2one('ir.attachment', 'Key File'),
-        'uniqueId': fields.integer('Unique ID'),
+        'partner_id': fields.many2one('res.partner', 'Partner'),
         'service': fields.many2one('wsafip.service', 'Service'),
+        'certificate': fields.many2one('crypto.certificate', 'Certificate Signer'),
+        'url': fields.char('URL', size=512),
+        'uniqueid': fields.integer_big('Unique ID'),
         'token': fields.char('Token', size=512),
-        'sign': field.char('Sign', size=512),
-        'generationTime': field.datetime('Generation Time'),
-        'expirationTime': field.datetime('Expiration Time'),
-        'status': field.function('Status', _get_status),
+        'sign': fields.char('Sign', size=512),
+        'generationtime': fields.datetime('Generation Time'),
+        'expirationtime': fields.datetime('Expiration Time'),
+        'status': fields.function(_get_status, method=True, string='Status', type='char'),
     }
 
     def login(self, cr, uid, ids, context=None):
-        if self.state == 'Connected': return
 
-        obj_partner = self.pool.get('res.partner')
-        obj_attachment = self.pool.get('ir.attachment')
+        status = self._get_status(cr, uid, ids, None, None)
 
-###
-        bind = LoginCMSServiceLocator().getLoginCms()
+        for ws in self.browse(cr, uid, [ _id for _id, _stat in status.items() if _stat != 'Connected' ]):
+            obj_partner = self.pool.get('res.partner')
+            obj_attachment = self.pool.get('ir.attachment')
 
-        keyfile = 
-        certfile = 
-        S = Signer(keyfile, certfile)
+            bind = LoginCMSServiceLocator().getLoginCms(url=ws.url)
 
-        uniqueId=randint(0, 10**9)
-        generationTime=(datetime.now(tzlocal()) - timedelta(0,60)).isoformat(),
-        expirationTime=(datetime.now(tzlocal()) + timedelta(0,60)).isoformat(),
-        service=self.service
-        msg = S(_login_message.format(
-            uniqueId=1313901283,
-            generationTime=(datetime.now(tzlocal()) - timedelta(0,60)).isoformat(),
-            expirationTime=(datetime.now(tzlocal()) + timedelta(0,60)).isoformat(),
-            service='wsfe'
-        ))
+            uniqueid=randint(0, 10**9)
+            generationtime=(datetime.now(tzlocal()) - timedelta(0,60)).isoformat(),
+            expirationtime=(datetime.now(tzlocal()) + timedelta(0,60)).isoformat(),
+            msg = _login_message.format(
+                uniqueid=uniqueid,
+                generationtime=(datetime.now(tzlocal()) - timedelta(0,60)).isoformat(),
+                expirationtime=(datetime.now(tzlocal()) + timedelta(0,60)).isoformat(),
+                service=ws.service.code
+            )
+            msg = ws.certificate.smime(msg)[ws.certificate.id]
+            head, body, end = msg.split('\n\n')
 
-        request  = loginCmsRequest()
-        request._in0 = msg
-        response = bind.loginCms(request)
+            request  = loginCmsRequest()
+            request._in0 = body
+            response = bind.loginCms(request)
 
-        T = ET.fromstring(response._loginCmsReturn)
+            T = ET.fromstring(response._loginCmsReturn)
 
-        auth_data = {
-        'source' : T.find('header/source').text,
-        'destination' : T.find('header/destination').text,
-        'uniqueId' : int(T.find('header/uniqueId').text),
-        'generationTime' : dateparse(T.find('header/generationTime').text),
-        'expirationTime' : dateparse(T.find('header/expirationTime').text),
-        'token' : T.find('credentials/token').text,
-        'sign' : T.find('credentials/sign').text,
-        }
+            auth_data = {
+            'source' : T.find('header/source').text,
+            'destination' : T.find('header/destination').text,
+            'uniqueid' : int(T.find('header/uniqueId').text),
+            'generationtime' : dateparse(T.find('header/generationTime').text),
+            'expirationtime' : dateparse(T.find('header/expirationTime').text),
+            'token' : T.find('credentials/token').text,
+            'sign' : T.find('credentials/sign').text,
+            }
 
-        # Faltan los asserts!
-        assert(int(auth_data('uniqueId'))==uniqueId)
-        assert(auth_data('generationTime') < datetime.now(tzlocal()))
-        assert(datetime.now(tzlocal()) < auth_data('expirationTime'))
+            del auth_data['source']
+            del auth_data['destination']
 
-        self.uniqueId = auth_data('uniqueId')
-        self.token = auth_data('token')
-        self.sign = auth_data('sign')
-        self.generationTime = auth_data('generationTime')
-        self.experationTime = auth_data('experationTime')
+            self.write(cr, uid, ws.id, auth_data)
 
-wsafip_service()
+    def set_auth_request(self, cr, uid, ids, request):
+        assert(type(ids) == int)
+        auth = self.browse(cr, uid, ids)
+        argAuth = request.new_argAuth()
+        argAuth.set_element_Token(auth.token)
+        argAuth.set_element_Sign(auth.sign)
+        argAuth.set_element_cuit(auth.partner_id.vat)
+        request.ArgAuth = argAuth
+        return request
+
+wsafip_authorization()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
