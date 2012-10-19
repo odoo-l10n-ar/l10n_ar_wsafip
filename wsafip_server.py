@@ -18,8 +18,16 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+from osv import fields, osv
 
-import wsafip_server
-import wsafip_authorization
+class wsafip_server(osv.osv):
+    _name = "wsafip.server"
+    _columns = {
+        'name': fields.char('Name', size=64),
+        'code': fields.char('Code', size=16),
+        'class': fields.char('Class', size=16),
+        'url': fields.char('URL', size=512)
+    }
+wsafip_server()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

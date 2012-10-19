@@ -47,6 +47,7 @@ Para poder ejecutar los tests es necesario cargar la clave privada y el certific
         'test/test_wsafip_service.yml',
     ],
     'update_xml': [
+        'data/wsafip_server.xml',
     ],
     'active': False,
     'installable': True,

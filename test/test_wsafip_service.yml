@@ -8,9 +8,11 @@
 -
  In order to test afip webservices append FE service
 -
-  !record {model: wsafip.service, id: wsfe_ar_0}:
-    name: Factura Electronica
+  !record {model: wsafip.server, id: wsfe_ar_0}:
+    name: Factura Electronica en Homologación
     code: wsfe
+    class: homologación
+    url: https://wswhomo.afip.gov.ar/wsfe/service.asmx
 
 -
  In order to test afip webservices append an FE service instance
@@ -18,9 +20,9 @@
   !record {model: wsafip.authorization, id: authorization_ar_0}:
     name: Moldeo Interactive FE
     partner_id: ctmil_ar_0
-    service: wsfe_ar_0
+    server_id: wsfe_ar_0
+    logging_id: wsaa_homo
     certificate: cert_ar_0
-    url: https://wsaahomo.afip.gov.ar/ws/services/LoginCms
 
 -
  Now test login
