@@ -78,6 +78,7 @@ class wsafip_authorization(osv.osv):
         'generationtime': fields.datetime('Generation Time'),
         'expirationtime': fields.datetime('Expiration Time'),
         'status': fields.function(_get_status, method=True, string='Status', type='char'),
+        'batch_sequence_id': fields.many2one('ir.sequence', 'Batch Sequence'),
     }
 
     def login(self, cr, uid, ids, context=None):

@@ -6,6 +6,13 @@
     vat: ar30712007288
 
 -
+ In order to test afip webservices setup a sequence for batch number
+-
+  !record {model: ir.sequence, id: ws_sequence_0}:
+    name: AFIP Web Service Sequence
+    code: ws_afip_sequence
+
+-
  In order to test afip webservices append FE service
 -
   !record {model: wsafip.server, id: wsfe_ar_0}:
@@ -23,6 +30,7 @@
     server_id: wsfe_ar_0
     logging_id: wsaa_homo
     certificate: cert_ar_0
+    batch_sequence_id: ws_sequence_0
 
 -
  Now test login
