@@ -43,5 +43,5 @@
  Check login result
 -
   !assert {model: wsafip.authorization, id: authorization_ar_0, string: Wrong authorization}:
-        - status == 'Connected'
+        - state == 'connected'
 

@@ -46,22 +46,22 @@ class wsafip_authorization(osv.osv):
     def logger(self, log, msg):
         self._logger.notifyChannel('addons.'+self._name, log, msg)
 
-    def _get_status(self, cr, uid, ids, fields_name, arg, context=None):
+    def _get_state(self, cr, uid, ids, fields_name, arg, context=None):
         r = {}
         for auth in self.browse(cr, uid, ids):
             if False in (auth.uniqueid, auth.generationtime, auth.expirationtime, auth.token, auth.sign):
                 self.logger(netsvc.LOG_INFO, "AFIP reject connection.")
-                r[auth.id]='Disconnected'
+                r[auth.id]='disconnected'
             elif not dateparse(auth.generationtime) - timedelta(0,5) < datetime.now() :
-                self.logger(netsvc.LOG_WARNING, "Shifted Clock. Server: %s, Now: %s" %
+                self.logger(netsvc.LOG_WARNING, "clockshifted. Server: %s, Now: %s" %
                             (str(dateparse(auth.generationtime)), str(datetime.now())))
-                self.logger(netsvc.LOG_WARNING, "Shifted Clock. Please syncronize your host to a NTP server.")
-                r[auth.id]='Shifted Clock'
+                self.logger(netsvc.LOG_WARNING, "clockshifted. Please syncronize your host to a NTP server.")
+                r[auth.id]='clockshifted'
             elif datetime.now() < dateparse(auth.expirationtime):
-                r[auth.id]='Connected'
+                r[auth.id]='connected'
             else:
-                self.logger(netsvc.LOG_INFO, "Invalid Connection to AFIP.")
-                r[auth.id]='Invalid'
+                self.logger(netsvc.LOG_INFO, "invalid Connection to AFIP.")
+                r[auth.id]='invalid'
             # 'Invalid Partner' si el cuit del partner no es el mismo al de la clave publica/privada.
         return r
 
@@ -72,21 +72,26 @@ class wsafip_authorization(osv.osv):
         'server_id': fields.many2one('wsafip.server', 'Service Server'),
         'logging_id': fields.many2one('wsafip.server', 'Authorization Server'),
         'certificate': fields.many2one('crypto.certificate', 'Certificate Signer'),
-        'uniqueid': fields.integer_big('Unique ID'),
-        'token': fields.text('Token'),
-        'sign': fields.text('Sign'),
-        'generationtime': fields.datetime('Generation Time'),
-        'expirationtime': fields.datetime('Expiration Time'),
-        'status': fields.function(_get_status, method=True, string='Status', type='char'),
-        'batch_sequence_id': fields.many2one('ir.sequence', 'Batch Sequence'),
+        'uniqueid': fields.integer_big('Unique ID', readonly=True),
+        'token': fields.text('Token', readonly=True),
+        'sign': fields.text('Sign', readonly=True),
+        'generationtime': fields.datetime('Generation Time', readonly=True),
+        'expirationtime': fields.datetime('Expiration Time', readonly=True),
+        'state': fields.function(_get_state, method=True, string='Status', type='char', readonly=True),
+        'batch_sequence_id': fields.many2one('ir.sequence', 'Batch Sequence', readonly=False),
+    }
+
+    _defaults = {
+        'partner_id': lambda self, cr, uid, c: self.pool.get('res.users').browse(cr, uid, [uid], c)[0].company_id.partner_id.id,
+#        'logging_id': lambda self, cr, uid, c: self.pool.get('wsafip.server').search(cr, uid, [('code','=','wsaa'), ('class','=','homologación')], c)[0],
     }
 
     def login(self, cr, uid, ids, context=None):
 
-        status = self._get_status(cr, uid, ids, None, None)
+        state = self._get_state(cr, uid, ids, None, None)
 
-        for ws in self.browse(cr, uid, [ _id for _id, _stat in status.items()
-                                        if _stat not in [ 'Connected', 'Shifted Clock' ]]):
+        for ws in self.browse(cr, uid, [ _id for _id, _stat in state.items()
+                                        if _stat not in [ 'connected', 'clockshifted' ]]):
             obj_partner = self.pool.get('res.partner')
             obj_attachment = self.pool.get('ir.attachment')
 
@@ -143,6 +148,10 @@ class wsafip_authorization(osv.osv):
             return r[ids[0]]
         else:
             return r
+
+    def do_login(self, cr, uid, ids, context=None):
+        self.login(cr, uid, ids)
+        return {}
 
 wsafip_authorization()
 
