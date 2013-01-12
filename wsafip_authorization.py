@@ -150,7 +150,10 @@ class wsafip_authorization(osv.osv):
             return r
 
     def do_login(self, cr, uid, ids, context=None):
-        self.login(cr, uid, ids)
+        try:
+            self.login(cr, uid, ids)
+        except FaultException, m:
+            raise osv.except_osv(_('AFIP Message'), _(m))
         return {}
 
 wsafip_authorization()

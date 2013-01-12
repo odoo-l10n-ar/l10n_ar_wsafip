@@ -29,18 +29,17 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="AFIP Authorization">
-                    <field name="name"/> <field name='partner_id'/>
-                    <field name='server_id'/>
-                    <field name='logging_id'/>
-                    <field name='certificate'/>
-                    <field name='uniqueid'/>
-                    <field name='token'/>
-                    <field name='sign'/>
-                    <field name='generationtime'/>
-                    <field name='expirationtime'/>
-                    <field name='state'/>
-                    <field name='batch_sequence_id'/>
-                    <button name='do_login' string="Login" type="object"/>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="server_id"/>
+                    <field name="logging_id"/>
+                    <field name="certificate"/>
+                    <field name="batch_sequence_id"/>
+                    <field name="uniqueid"/>
+                    <field name="generationtime"/>
+                    <field name="expirationtime"/>
+                    <field name="state"/>
+                    <button colspan="2" name="do_login" string="Login" type="object" states="disconnected,invalid"/>
                 </form>
             </field>
         </record>
