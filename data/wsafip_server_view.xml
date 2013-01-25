@@ -26,9 +26,8 @@
         <record id="view_wsafip_server_form" model="ir.ui.view">
             <field name="name">wsafip.server.form</field>
             <field name="model">wsafip.server</field>
-            <field name="type">form</field>
             <field name="arch" type="xml">
-		    <form>
+		    <form string="AFIP server">
                     <field name="name"/>
                     <field name="code"/>
                     <field name="class"/>
@@ -40,9 +39,8 @@
         <record id="view_wsafip_server_tree" model="ir.ui.view">
             <field name="name">wsafip.server.tree</field>
             <field name="model">wsafip.server</field>
-            <field name="type">tree</field>
             <field name="arch" type="xml">
-		        <tree>
+		        <tree string="AFIP server">
                     <field name="name"/>
                     <field name="code"/>
                     <field name="class"/>

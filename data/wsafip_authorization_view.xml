@@ -26,7 +26,6 @@
         <record id="view_wsafip_auth_form" model="ir.ui.view">
             <field name="name">wsafip.auth.form</field>
             <field name="model">wsafip.authorization</field>
-            <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="AFIP Authorization">
                     <field name="name"/>
@@ -47,7 +46,6 @@
         <record id="view_wsafip_auth_tree" model="ir.ui.view">
             <field name="name">wsafip.auth.tree</field>
             <field name="model">wsafip.authorization</field>
-            <field name="type">tree</field>
             <field name="arch" type="xml">
                 <tree string="AFIP Authorization">
                     <field name="name"/>

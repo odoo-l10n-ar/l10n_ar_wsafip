@@ -28,6 +28,10 @@ from dateutil.tz import tzlocal
 from datetime import datetime, timedelta
 from tools.translate import _
 import netsvc
+import logging
+
+_logger = logging.getLogger(__name__)
+_schema = logging.getLogger(__name__ + '.schema')
 
 _login_message="""\
 <?xml version="1.0" encoding="UTF-8"?>
@@ -41,11 +45,6 @@ _login_message="""\
 </loginTicketRequest>"""
 
 class wsafip_authorization(osv.osv):
-    _logger = netsvc.Logger()
-
-    def logger(self, log, msg):
-        self._logger.notifyChannel('addons.'+self._name, log, msg)
-
     def _get_state(self, cr, uid, ids, fields_name, arg, context=None):
         r = {}
         for auth in self.browse(cr, uid, ids):
@@ -72,7 +71,7 @@ class wsafip_authorization(osv.osv):
         'server_id': fields.many2one('wsafip.server', 'Service Server'),
         'logging_id': fields.many2one('wsafip.server', 'Authorization Server'),
         'certificate': fields.many2one('crypto.certificate', 'Certificate Signer'),
-        'uniqueid': fields.integer_big('Unique ID', readonly=True),
+        'uniqueid': fields.integer('Unique ID', readonly=True),
         'token': fields.text('Token', readonly=True),
         'sign': fields.text('Sign', readonly=True),
         'generationtime': fields.datetime('Generation Time', readonly=True),
