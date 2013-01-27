@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (C), 2012, OpenERP - Team de Localización Argentina.
+ https://launchpad.net/~openerp-l10n-ar-localization
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+<openerp>
+    <data>
+
+    <!-- Generate request -->
+
+        <record id="view_wsafip_keygen_config" model="ir.ui.view">
+            <field name="name">l10n_ar_wsafip.keygen_config.form</field>
+            <field name="model">l10n_ar_wsafip.keygen_config</field>
+            <field name="inherit_id" ref="base.res_config_view_base"/>
+            <field name="arch" type="xml">
+              <data>
+                <form position="attributes" version="7.0">
+                    <attribute name="string">AFIP Web service Configuration - Request Generation</attribute>
+                </form>
+                <group string="res_config_contents" position="replace">
+                    <group colspan="8">
+                        <field name="company_id" widget="selection" on_change="update_data(company_id)"/>
+                        <field name="country_id" widget="selection"/>
+                        <field name="state_id" widget="selection"/>
+                        <field name="city"/>
+                        <field name="department"/>
+                        <field name="cuit"/>
+                        <field name="name"/>
+                    </group>
+                </group>
+              </data>
+            </field>
+        </record>
+
+        <record id="action_wsafip_keygen_config" model="ir.actions.act_window">
+          <field name="name">AFIP Web service Configuration - Request Generation</field>
+          <field name="type">ir.actions.act_window</field>
+          <field name="res_model">l10n_ar_wsafip.keygen_config</field>
+          <field name="view_id" ref="view_wsafip_keygen_config"/>
+              <field name="view_type">form</field>
+              <field name="view_mode">form</field>
+              <field name="target">new</field>
+        </record>
+
+        <record id="wsafip_keygen_config_todo" model="ir.actions.todo">
+            <field name="action_id" ref="action_wsafip_keygen_config"/>
+            <field name="sequence">20</field>
+            <field name="restart">always</field>
+        </record>
+
+    <!-- Load certificate -->
+
+        <record id="view_wsafip_loadcert_config" model="ir.ui.view">
+            <field name="name">l10n_ar_wsafip.loadcert_config.form</field>
+            <field name="model">l10n_ar_wsafip.loadcert_config</field>
+            <field name="inherit_id" ref="base.res_config_view_base"/>
+            <field name="arch" type="xml">
+              <data>
+                <form position="attributes" version="7.0">
+                    <attribute name="string">AFIP Web service Configuration - Load Certificate</attribute>
+                </form>
+                <group string="res_config_contents" position="replace">
+                    <group colspan="8">
+                        <field name="request_id" widget="selection" on_change="update_data(request_id)"/>
+                        <field name="request_string"/>
+                        <!--field name="request_file" filename="certificate.txt"/-->
+                        <field name="response_string"/>
+                    </group>
+                </group>
+              </data>
+            </field>
+        </record>
+
+        <record id="action_wsafip_loadcert_config" model="ir.actions.act_window">
+          <field name="name">AFIP Web service Configuration - Load Certificate</field>
+          <field name="type">ir.actions.act_window</field>
+          <field name="res_model">l10n_ar_wsafip.loadcert_config</field>
+          <field name="view_id" ref="view_wsafip_loadcert_config"/>
+              <field name="view_type">form</field>
+              <field name="view_mode">form</field>
+              <field name="target">new</field>
+        </record>
+
+        <record id="wsafip_keygen_loadcert_todo" model="ir.actions.todo">
+            <field name="action_id" ref="action_wsafip_loadcert_config"/>
+            <field name="sequence">21</field>
+            <field name="restart">always</field>
+        </record>
+
+
+    </data>
+</openerp>
+<!--
+     vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+-->
