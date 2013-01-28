@@ -29,6 +29,8 @@ from datetime import datetime, timedelta
 from tools.translate import _
 import netsvc
 import logging
+from M2Crypto.X509 import X509Error
+from ZSI import FaultException
 
 _logger = logging.getLogger(__name__)
 _schema = logging.getLogger(__name__ + '.schema')
@@ -49,17 +51,17 @@ class wsafip_authorization(osv.osv):
         r = {}
         for auth in self.browse(cr, uid, ids):
             if False in (auth.uniqueid, auth.generationtime, auth.expirationtime, auth.token, auth.sign):
-                self.logger(netsvc.LOG_INFO, "AFIP reject connection.")
+                _logger.info("AFIP reject connection.")
                 r[auth.id]='disconnected'
             elif not dateparse(auth.generationtime) - timedelta(0,5) < datetime.now() :
-                self.logger(netsvc.LOG_WARNING, "clockshifted. Server: %s, Now: %s" %
+                _logger.warning("clockshifted. Server: %s, Now: %s" %
                             (str(dateparse(auth.generationtime)), str(datetime.now())))
-                self.logger(netsvc.LOG_WARNING, "clockshifted. Please syncronize your host to a NTP server.")
+                _logger.warning("clockshifted. Please syncronize your host to a NTP server.")
                 r[auth.id]='clockshifted'
             elif datetime.now() < dateparse(auth.expirationtime):
                 r[auth.id]='connected'
             else:
-                self.logger(netsvc.LOG_INFO, "invalid Connection to AFIP.")
+                _logger.info("invalid Connection to AFIP.")
                 r[auth.id]='invalid'
             # 'Invalid Partner' si el cuit del partner no es el mismo al de la clave publica/privada.
         return r
@@ -127,7 +129,7 @@ class wsafip_authorization(osv.osv):
             del auth_data['source']
             del auth_data['destination']
 
-            self.logger(netsvc.LOG_INFO, "Successful Connection to AFIP.")
+            _logger.info("Successful Connection to AFIP.")
             self.write(cr, uid, ws.id, auth_data)
 
     def set_auth_request(self, cr, uid, ids, request):
@@ -151,6 +153,8 @@ class wsafip_authorization(osv.osv):
     def do_login(self, cr, uid, ids, context=None):
         try:
             self.login(cr, uid, ids)
+        except X509Error, m:
+            raise osv.except_osv(_('Certificate Error'), _(m))
         except FaultException, m:
             raise osv.except_osv(_('AFIP Message'), _(m))
         return {}

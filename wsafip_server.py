@@ -25,8 +25,8 @@ class wsafip_server(osv.osv):
     _columns = {
         'name': fields.char('Name', size=64),
         'code': fields.char('Code', size=16),
-        'class': fields.char('Class', size=16),
-        'url': fields.char('URL', size=512)
+        'class': fields.selection([('production','Production'),('homologation','Homologation')], 'Class'),
+        'url': fields.char('URL', size=512),
     }
 wsafip_server()
 
