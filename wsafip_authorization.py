@@ -156,6 +156,8 @@ class wsafip_authorization(osv.osv):
         except X509Error, m:
             raise osv.except_osv(_('Certificate Error'), _(m))
         except FaultException, m:
+            if type(m) is not str:
+                m = m.fault.string
             raise osv.except_osv(_('AFIP Message'), _(m))
         return {}
 
