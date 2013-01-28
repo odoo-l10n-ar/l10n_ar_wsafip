@@ -56,9 +56,10 @@
         </record>
 
         <record id="wsafip_keygen_config_todo" model="ir.actions.todo">
+            <field name="name">AFIP Web service Configuration - Request Generation</field>
             <field name="action_id" ref="action_wsafip_keygen_config"/>
-            <field name="sequence">20</field>
-            <field name="restart">always</field>
+            <field name="sequence">30</field>
+            <field name="type">automatic</field>
         </record>
 
     <!-- Load certificate -->
@@ -95,9 +96,10 @@
         </record>
 
         <record id="wsafip_keygen_loadcert_todo" model="ir.actions.todo">
+            <field name="name">AFIP Web service Configuration - Load Certificate</field>
             <field name="action_id" ref="action_wsafip_loadcert_config"/>
-            <field name="sequence">21</field>
-            <field name="restart">always</field>
+            <field name="sequence">35</field>
+            <field name="type">automatic</field>
         </record>
 
 
