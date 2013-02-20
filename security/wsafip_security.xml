@@ -17,7 +17,7 @@
         <record id="group_wsafip_user" model="res.groups" context="{'noadmin':True}">
             <field name="name">AFIP WebService User</field>
             <field name="category_id" ref="base.module_category_accounting_and_finance"/>
-            <field name="implied_ids" eval="[(4, ref('l10n_ar_invoice.group_l10n_ar_invoice_user'))]"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         </record>
 
     </data>
