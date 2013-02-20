@@ -26,7 +26,7 @@ import xml.etree.ElementTree as ET
 from dateutil.parser import parse as dateparse
 from dateutil.tz import tzlocal
 from datetime import datetime, timedelta
-from tools.translate import _
+from openerp.tools.translate import _
 import netsvc
 import logging
 from M2Crypto.X509 import X509Error
