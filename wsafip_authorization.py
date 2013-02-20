@@ -27,7 +27,6 @@ from dateutil.parser import parse as dateparse
 from dateutil.tz import tzlocal
 from datetime import datetime, timedelta
 from openerp.tools.translate import _
-import netsvc
 import logging
 from M2Crypto.X509 import X509Error
 from ZSI import FaultException
