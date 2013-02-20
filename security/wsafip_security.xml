@@ -10,7 +10,7 @@
 
         <record id="group_wsafip_admin" model="res.groups">
             <field name="name">AFIP WebService Manager</field>
-            <field name="category_id" ref="l10n_ar.module_category_l10n_ar_wsafip"/>
+            <field name="category_id" ref="module_category_l10n_ar_wsafip"/>
             <field name="implied_ids" eval="[(4,ref('base.group_user'))]"/>
         </record>
 
