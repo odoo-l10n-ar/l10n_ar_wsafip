@@ -45,6 +45,9 @@ _login_message="""\
 <service>{service}</service>
 </loginTicketRequest>"""
 
+_intmin = -2147483648
+_intmax = 2147483647
+
 class wsafip_authorization(osv.osv):
     def _get_state(self, cr, uid, ids, fields_name, arg, context=None):
         r = {}
@@ -97,11 +100,11 @@ class wsafip_authorization(osv.osv):
 
             bind = LoginCMSServiceLocator().getLoginCms(url=ws.logging_id.url)
 
-            uniqueid=randint(0, 10**9)
+            uniqueid=randint(_intmin, _intmax)
             generationtime=(datetime.now(tzlocal()) - timedelta(0,60)).isoformat(),
             expirationtime=(datetime.now(tzlocal()) + timedelta(0,60)).isoformat(),
             msg = _login_message.format(
-                uniqueid=uniqueid,
+                uniqueid=uniqueid-_intmin,
                 generationtime=(datetime.now(tzlocal()) - timedelta(0,60)).isoformat(),
                 expirationtime=(datetime.now(tzlocal()) + timedelta(0,60)).isoformat(),
                 service=ws.server_id.code
@@ -118,7 +121,7 @@ class wsafip_authorization(osv.osv):
             auth_data = {
             'source' : T.find('header/source').text,
             'destination' : T.find('header/destination').text,
-            'uniqueid' : int(T.find('header/uniqueId').text),
+            'uniqueid' : int(T.find('header/uniqueId').text)+_intmin,
             'generationtime' : dateparse(T.find('header/generationTime').text),
             'expirationtime' : dateparse(T.find('header/expirationTime').text),
             'token' : T.find('credentials/token').text,
