@@ -5,7 +5,7 @@
         <record model='ir.sequence.type' id='ws_sequence_type'>
             <field name='name'>Sequence of Batch Number for AFIP Web Services</field>
             <field name='code'>ws_afip_sequence</field>
-	    <field name='implementation'>standard</field></field>
+	    <field name='implementation'>standard</field>
 	</record>
 
     </data>
