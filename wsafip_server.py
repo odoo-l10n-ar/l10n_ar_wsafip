@@ -31,7 +31,7 @@ class wsafip_server(osv.osv):
         reads = self.read(cr, uid, ids, ['name','class'], context=context)
         res = []
         for record in reads:
-            res.append(record['id']: "{name} [{class}]".format(record))
+            res[record['id']]="{name} [{class}]".format(record)
         return res
  
     _columns = {
