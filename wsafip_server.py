@@ -23,7 +23,7 @@ from openerp.osv import fields, osv
 class wsafip_server(osv.osv):
     _name = "wsafip.server"
 
-    def get_name(self, cr, uid, ids, context=None):
+    def name_get(self, cr, uid, ids, context=None):
         if isinstance(ids, (list, tuple)) and not len(ids):
             return []
         if isinstance(ids, (long, int)):
@@ -31,7 +31,7 @@ class wsafip_server(osv.osv):
         reads = self.read(cr, uid, ids, ['name','class'], context=context)
         res = []
         for record in reads:
-            res[record['id']]="{name} [{class}]".format(record)
+            res.append((record['id'], u"{name} [{class}]".format(**record)))
         return res
  
     _columns = {

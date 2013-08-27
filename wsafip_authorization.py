@@ -80,7 +80,17 @@ class wsafip_authorization(osv.osv):
         'sign': fields.text('Sign', readonly=True),
         'generationtime': fields.datetime('Generation Time', readonly=True),
         'expirationtime': fields.datetime('Expiration Time', readonly=True),
-        'state': fields.function(_get_state, method=True, string='Status', type='char', readonly=True),
+        'state': fields.function(_get_state,
+                                 method=True,
+                                 string='Status',
+                                 type='selection',
+                                 selection=[
+                                         ('clockshifted', 'Clock shifted'),
+                                         ('connected', 'Connected'),
+                                         ('disconnected', 'Disconnected'),
+                                         ('invalid', 'Invalid'),
+                                 ],
+                                 readonly=True),
         'batch_sequence_id': fields.many2one('ir.sequence', 'Batch Sequence', readonly=False),
     }
 
