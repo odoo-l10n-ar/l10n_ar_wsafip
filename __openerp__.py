@@ -50,7 +50,7 @@ Para poder ejecutar los tests es necesario cargar la clave privada y el certific
         'data/wsafip_sequence.xml',
         'data/wsafip_server.xml',
         'data/wsafip_menuitem.xml',
-        'data/wsafip_authorization_view.xml',
+        'data/wsafip_connection_view.xml',
         'data/wsafip_server_view.xml',
         'data/wsafip_config.xml',
         'security/wsafip_security.xml',

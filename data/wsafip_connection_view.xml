@@ -25,7 +25,7 @@
 
         <record id="view_wsafip_auth_form" model="ir.ui.view">
             <field name="name">wsafip.auth.form</field>
-            <field name="model">wsafip.authorization</field>
+            <field name="model">wsafip.connection</field>
             <field name="arch" type="xml">
                 <form string="AFIP Authorization" version="7.0">
 		    <header>
@@ -53,7 +53,7 @@
 
         <record id="view_wsafip_auth_tree" model="ir.ui.view">
             <field name="name">wsafip.auth.tree</field>
-            <field name="model">wsafip.authorization</field>
+            <field name="model">wsafip.connection</field>
             <field name="arch" type="xml">
                 <tree string="AFIP Authorization">
                     <field name="name"/>
@@ -63,9 +63,9 @@
         </record>
 
         <record model="ir.actions.act_window" id="act_wsafip_auth">
-            <field name="name">AFIP Sessions</field>
+            <field name="name">AFIP Connections</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">wsafip.authorization</field>
+            <field name="res_model">wsafip.connection</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>

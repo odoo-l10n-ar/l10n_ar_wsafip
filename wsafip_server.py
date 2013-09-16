@@ -33,13 +33,14 @@ class wsafip_server(osv.osv):
         for record in reads:
             res.append((record['id'], u"{name} [{class}]".format(**record)))
         return res
- 
+
     _columns = {
         'name': fields.char('Name', size=64, select=1),
         'code': fields.char('Code', size=16, select=1),
         'class': fields.selection([('production','Production'),('homologation','Homologation')], 'Class'),
         'url': fields.char('URL', size=512),
     }
+
 wsafip_server()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
