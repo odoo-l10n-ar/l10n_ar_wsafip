@@ -30,6 +30,7 @@ from openerp.tools.translate import _
 import logging
 from M2Crypto.X509 import X509Error
 from ZSI import FaultException
+from cache_bind import get_bind
 
 _logger = logging.getLogger(__name__)
 _schema = logging.getLogger(__name__ + '.schema')
@@ -48,12 +49,28 @@ _login_message="""\
 _intmin = -2147483648
 _intmax = 2147483647
 
-class wsafip_authorization(osv.osv):
+class service_callback(object):
+    def __init__(self, conn):
+        self._conn = conn
+        self._srv = conn.server_id
+
+    def __getattribute__(self, name):
+        if name[0] == '_': 
+            return object.__getattribute__(self, name)
+        fname = "{0}_{1}".format(self._srv.code, name)
+        if hasattr(self._srv, fname):
+            def proxy_function(*args, **kwargs):
+                return self._srv.__getattr__(fname)(self._conn.id, *args, **kwargs)
+            return proxy_function
+        else:
+            return object.__getattribute__(self, name)
+
+class wsafip_connection(osv.osv):
     def _get_state(self, cr, uid, ids, fields_name, arg, context=None):
         r = {}
         for auth in self.browse(cr, uid, ids):
             if False in (auth.uniqueid, auth.generationtime, auth.expirationtime, auth.token, auth.sign):
-                _logger.info("AFIP reject connection.")
+                _logger.info("Disconnected from AFIP.")
                 r[auth.id]='disconnected'
             elif not dateparse(auth.generationtime) - timedelta(0,5) < datetime.now() :
                 _logger.warning("clockshifted. Server: %s, Now: %s" %
@@ -63,12 +80,12 @@ class wsafip_authorization(osv.osv):
             elif datetime.now() < dateparse(auth.expirationtime):
                 r[auth.id]='connected'
             else:
-                _logger.info("invalid Connection to AFIP.")
+                _logger.info("Invalid Connection from AFIP.")
                 r[auth.id]='invalid'
             # 'Invalid Partner' si el cuit del partner no es el mismo al de la clave publica/privada.
         return r
 
-    _name = "wsafip.authorization"
+    _name = "wsafip.connection"
     _columns = {
         'name': fields.char('Name', size=64),
         'partner_id': fields.many2one('res.partner', 'Partner'),
@@ -80,7 +97,17 @@ class wsafip_authorization(osv.osv):
         'sign': fields.text('Sign', readonly=True),
         'generationtime': fields.datetime('Generation Time', readonly=True),
         'expirationtime': fields.datetime('Expiration Time', readonly=True),
-        'state': fields.function(_get_state, method=True, string='Status', type='char', readonly=True),
+        'state': fields.function(_get_state,
+                                 method=True,
+                                 string='Status',
+                                 type='selection',
+                                 selection=[
+                                         ('clockshifted', 'Clock shifted'),
+                                         ('connected', 'Connected'),
+                                         ('disconnected', 'Disconnected'),
+                                         ('invalid', 'Invalid'),
+                                 ],
+                                 readonly=True),
         'batch_sequence_id': fields.many2one('ir.sequence', 'Batch Sequence', readonly=False),
     }
 
@@ -134,18 +161,18 @@ class wsafip_authorization(osv.osv):
             _logger.info("Successful Connection to AFIP.")
             self.write(cr, uid, ws.id, auth_data)
 
-    def set_auth_request(self, cr, uid, ids, request):
+    def set_auth_request(self, cr, uid, ids, request, context=None):
         r = {}
         for auth in self.browse(cr, uid, ids):
-            argAuth = request.new_argAuth()
-            argAuth.set_element_Token(auth.token.encode('ascii'))
-            argAuth.set_element_Sign(auth.sign.encode('ascii'))
+            Auth = request.new_Auth()
+            Auth.set_element_Token(auth.token.encode('ascii'))
+            Auth.set_element_Sign(auth.sign.encode('ascii'))
             if 'ar' in auth.partner_id.vat:
                 cuit = int(auth.partner_id.vat[2:])
-                argAuth.set_element_cuit(cuit)
+                Auth.set_element_Cuit(cuit)
             else:
                 raise osv.except_osv(_('Error in VATs'), _('Please check if your VAT is an Argentina one before continue.'))
-            request.ArgAuth = argAuth
+            request.Auth = Auth
             r[auth.id] = request
         if len(ids) == 1:
             return r[ids[0]]
@@ -163,6 +190,15 @@ class wsafip_authorization(osv.osv):
             raise osv.except_osv(_('AFIP Message'), _(m))
         return {}
 
-wsafip_authorization()
+    def get_callbacks(self, cr, uid, ids, context=None):
+        r = {}
+        _ids = [ids] if isinstance(ids, int) else ids
+
+        for conn in self.browse(cr, uid, _ids):
+            r[conn.id] = service_callback(conn)
+
+        return r[ids] if isinstance(ids, int) else r
+
+wsafip_connection()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

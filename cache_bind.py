@@ -23,21 +23,26 @@ This structure keep a cache structure to bind to not have continues connection
 to the server.
 """
 from sslhttps import HTTPSConnectionSSLVersion
-from stub.LoginCMSService_types import *
+from stub.LoginCMSService_client import *
+import sys
 
 PROXY_SIZE=5
-TRACE_FILE=None # To DEBUG: sys.stdout
+TRACE_FILE=sys.stdout # To DEBUG: sys.stdout
 
-ServiceSoap=ServiceLocator().getServiceSoap
+ServiceSoap=LoginCMSServiceLocator().getLoginCms
 
 _bind_cache = {}
 _bind_list  = []
 
-def get_bind(server):
+def get_bind(server, ssl=False):
+    import pdb; pdb.set_trace()
+    transport = HTTPSConnectionSSLVersion if ssl else None
     if not server.id in _bind_cache:
         if len(_bind_list) > PROXY_SIZE:
             del _bind_cache[_bind_list.pop(0)]
-        _bind_cache[server.id] = ServiceSoap(url=server.url, transport=HTTPSConnectionSSLVersion, tracefile=TRACE_FILE)
+        _bind_cache[server.id] = ServiceSoap(url=server.url,
+                                             transport=transport,
+                                             tracefile=TRACE_FILE)
         _bind_list.append(server.id)
     return _bind_cache[server.id]
 

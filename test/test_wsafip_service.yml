@@ -24,7 +24,7 @@
 -
  In order to test afip webservices append an FE service instance
 -
-  !record {model: wsafip.authorization, id: authorization_ar_0}:
+  !record {model: wsafip.connection, id: connection_ar_0}:
     name: Moldeo Interactive FE
     partner_id: ctmil_ar_0
     server_id: wsfe_ar_0
@@ -35,13 +35,13 @@
 -
  Now test login
 -
-  !python {model: wsafip.authorization}: |
-       A = self.browse(cr, uid, ref('authorization_ar_0'))
+  !python {model: wsafip.connection}: |
+       A = self.browse(cr, uid, ref('connection_ar_0'))
        A.login()
 
 -
  Check login result
 -
-  !assert {model: wsafip.authorization, id: authorization_ar_0, string: Wrong authorization}:
+  !assert {model: wsafip.connection, id: connection_ar_0, string: Wrong connection}:
         - state == 'connected'
 

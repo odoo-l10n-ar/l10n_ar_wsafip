@@ -27,11 +27,17 @@
             <field name="name">wsafip.server.form</field>
             <field name="model">wsafip.server</field>
             <field name="arch" type="xml">
-		    <form string="AFIP server">
-                    <field name="name"/>
-                    <field name="code"/>
-                    <field name="class"/>
-                    <field name="url"/>
+		<form string="AFIP server" version="7.0">
+		    <header>
+		    </header>
+		    <sheet string="AFIP Servers">
+			    <group>
+				    <field name="name"/>
+				    <field name="code"/>
+				    <field name="class"/>
+				    <field name="url"/>
+			    </group>
+		    </sheet>
                 </form>
             </field>
         </record>
