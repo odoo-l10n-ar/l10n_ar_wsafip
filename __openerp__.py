@@ -57,7 +57,7 @@ Para poder ejecutar los tests es necesario cargar la clave privada y el certific
         'security/ir.model.access.csv',
     ],
     'external_dependencies': {
-        'python': [ 'ZSI' ],
+        'python': [ 'suds' ],
     },
     'active': False,
     'installable': True,

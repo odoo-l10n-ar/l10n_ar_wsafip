@@ -39,6 +39,8 @@ class wsafip_server(osv.osv):
         'code': fields.char('Code', size=16, select=1),
         'class': fields.selection([('production','Production'),('homologation','Homologation')], 'Class'),
         'url': fields.char('URL', size=512),
+        'auth_conn_id': fields.one2many('wsafip.connection','logging_id','Authentication Connections'),
+        'conn_id': fields.one2many('wsafip.connection','server_id','Service Connections'),
     }
 
 wsafip_server()

@@ -19,18 +19,15 @@
 #
 ##############################################################################
 from openerp.osv import fields, osv
-from stub.LoginCMSService_types import *
-from stub.LoginCMSService_client import *
 from random import randint
 import xml.etree.ElementTree as ET
 from dateutil.parser import parse as dateparse
 from dateutil.tz import tzlocal
 from datetime import datetime, timedelta
 from openerp.tools.translate import _
+from suds.client import Client
 import logging
 from M2Crypto.X509 import X509Error
-from ZSI import FaultException
-from cache_bind import get_bind
 
 _logger = logging.getLogger(__name__)
 _schema = logging.getLogger(__name__ + '.schema')
@@ -48,22 +45,6 @@ _login_message="""\
 
 _intmin = -2147483648
 _intmax = 2147483647
-
-class service_callback(object):
-    def __init__(self, conn):
-        self._conn = conn
-        self._srv = conn.server_id
-
-    def __getattribute__(self, name):
-        if name[0] == '_': 
-            return object.__getattribute__(self, name)
-        fname = "{0}_{1}".format(self._srv.code, name)
-        if hasattr(self._srv, fname):
-            def proxy_function(*args, **kwargs):
-                return self._srv.__getattr__(fname)(self._conn.id, *args, **kwargs)
-            return proxy_function
-        else:
-            return object.__getattribute__(self, name)
 
 class wsafip_connection(osv.osv):
     def _get_state(self, cr, uid, ids, fields_name, arg, context=None):
@@ -113,7 +94,6 @@ class wsafip_connection(osv.osv):
 
     _defaults = {
         'partner_id': lambda self, cr, uid, c: self.pool.get('res.users').browse(cr, uid, [uid], c)[0].company_id.partner_id.id,
-#        'logging_id': lambda self, cr, uid, c: self.pool.get('wsafip.server').search(cr, uid, [('code','=','wsaa'), ('class','=','homologación')], c)[0],
     }
 
     def login(self, cr, uid, ids, context=None):
@@ -122,10 +102,7 @@ class wsafip_connection(osv.osv):
 
         for ws in self.browse(cr, uid, [ _id for _id, _stat in state.items()
                                         if _stat not in [ 'connected', 'clockshifted' ]]):
-            obj_partner = self.pool.get('res.partner')
-            obj_attachment = self.pool.get('ir.attachment')
-
-            bind = LoginCMSServiceLocator().getLoginCms(url=ws.logging_id.url)
+            aaclient = Client(ws.logging_id.url+'?WSDL')
 
             uniqueid=randint(_intmin, _intmax)
             generationtime=(datetime.now(tzlocal()) - timedelta(0,60)).isoformat(),
@@ -139,11 +116,9 @@ class wsafip_connection(osv.osv):
             msg = ws.certificate.smime(msg)[ws.certificate.id]
             head, body, end = msg.split('\n\n')
 
-            request  = loginCmsRequest()
-            request._in0 = body
-            response = bind.loginCms(request)
+            response = aaclient.service.loginCms(in0=body)
 
-            T = ET.fromstring(response._loginCmsReturn)
+            T = ET.fromstring(response)
 
             auth_data = {
             'source' : T.find('header/source').text,
@@ -161,7 +136,7 @@ class wsafip_connection(osv.osv):
             _logger.info("Successful Connection to AFIP.")
             self.write(cr, uid, ws.id, auth_data)
 
-    def set_auth_request(self, cr, uid, ids, request, context=None):
+    def old_set_auth_request(self, cr, uid, ids, request, context=None):
         r = {}
         for auth in self.browse(cr, uid, ids):
             Auth = request.new_Auth()
@@ -189,15 +164,6 @@ class wsafip_connection(osv.osv):
                 m = m.fault.string
             raise osv.except_osv(_('AFIP Message'), _(m))
         return {}
-
-    def get_callbacks(self, cr, uid, ids, context=None):
-        r = {}
-        _ids = [ids] if isinstance(ids, int) else ids
-
-        for conn in self.browse(cr, uid, _ids):
-            r[conn.id] = service_callback(conn)
-
-        return r[ids] if isinstance(ids, int) else r
 
 wsafip_connection()
 
