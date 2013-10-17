@@ -136,19 +136,16 @@ class wsafip_connection(osv.osv):
             _logger.info("Successful Connection to AFIP.")
             self.write(cr, uid, ws.id, auth_data)
 
-    def old_set_auth_request(self, cr, uid, ids, request, context=None):
+    def get_auth(self, cr, uid, ids, context=None):
         r = {}
         for auth in self.browse(cr, uid, ids):
-            Auth = request.new_Auth()
-            Auth.set_element_Token(auth.token.encode('ascii'))
-            Auth.set_element_Sign(auth.sign.encode('ascii'))
-            if 'ar' in auth.partner_id.vat:
-                cuit = int(auth.partner_id.vat[2:])
-                Auth.set_element_Cuit(cuit)
-            else:
-                raise osv.except_osv(_('Error in VATs'), _('Please check if your VAT is an Argentina one before continue.'))
-            request.Auth = Auth
-            r[auth.id] = request
+            if auth.partner_id.document_type_id.name != 'CUIT':
+                import pdb; pdb.set_trace()
+            r[auth.id] = {
+                'Token': auth.token.encode('ascii'),
+                'Sign': auth.sign.encode('ascii'),
+                'Cuit': auth.partner_id.document_number,
+            }
         if len(ids) == 1:
             return r[ids[0]]
         else:
