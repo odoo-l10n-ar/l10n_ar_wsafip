@@ -81,11 +81,13 @@ l10n_ar_wsafip_keygen_config()
 class l10n_ar_wsafip_loadcert_config(osv.osv_memory):
 
     def update_data(self, cr, uid, ids, certificate_id, context=None):
-        certificate = self.pool.get('crypto.certificate').browse(cr, uid, certificate_id)
-        v = {
-            'request_string': certificate.csr,
-            'request_file': base64.encodestring(certificate.csr),
-        }
+        v = {}
+        if certificate_id:
+            certificate = self.pool.get('crypto.certificate').browse(cr, uid, certificate_id)
+            v = {
+                'request_string': certificate.csr,
+                'request_file': base64.encodestring(certificate.csr),
+            }
         return {'value': v}
 
     def execute(self, cr, uid, ids, context=None):
