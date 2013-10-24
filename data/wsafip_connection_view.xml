@@ -27,7 +27,7 @@
             <field name="name">wsafip.auth.form</field>
             <field name="model">wsafip.connection</field>
             <field name="arch" type="xml">
-                <form string="AFIP Authorization" version="7.0">
+                <form string="AFIP Connector" version="7.0">
 		    <header>
 			    <button colspan="2" name="do_login" string="Login" type="object" states="disconnected,invalid"/>
 				<field name="state" widget="statusbar"
@@ -55,7 +55,7 @@
             <field name="name">wsafip.auth.tree</field>
             <field name="model">wsafip.connection</field>
             <field name="arch" type="xml">
-                <tree string="AFIP Authorization">
+                <tree string="AFIP Connector">
                     <field name="name"/>
                     <field name="state"/>
                 </tree>
