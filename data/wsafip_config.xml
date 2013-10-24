@@ -76,9 +76,10 @@
                 <group string="res_config_contents" position="replace">
                     <group colspan="8">
                         <field name="request_id" widget="selection" on_change="update_data(request_id)"/>
-                        <field name="request_string"/>
-                        <!--field name="request_file" filename="certificate.txt"/-->
-                        <field name="response_string"/>
+                        <!--field name="request_string"/-->
+                        <field name="request_file" filename="to_afip.csr"/>
+                        <!--field name="response_string"/-->
+                        <field name="response_file" filename="*.crt"/>
                     </group>
                 </group>
               </data>

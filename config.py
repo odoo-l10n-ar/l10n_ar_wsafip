@@ -104,8 +104,9 @@ class l10n_ar_wsafip_loadcert_config(osv.osv_memory):
     _inherit = 'res.config'
     _columns = {
         'request_id': fields.many2one('crypto.certificate', 'Certificate Request', required=True),
-        'request_file': fields.binary('', readonly=True),
+        'request_file': fields.binary('Download Request', readonly=True),
         'request_string': fields.text('Certificate string', readonly=True),
+        'response_file': fields.binary('Upload Request', required=True),
         'response_string': fields.text('Response string', required=True),
     }
     _defaults= {
