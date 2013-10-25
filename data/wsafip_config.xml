@@ -74,12 +74,24 @@
                     <attribute name="string">AFIP Web service Configuration - Load Certificate</attribute>
                 </form>
                 <group string="res_config_contents" position="replace">
+                    <separator string="Before start"/>
+                    <group col="1" colspan="8">
+                        <h3>Tareas a realizar en la <a href="https://auth.afip.gov.ar/contribuyente/">página del Clave Fiscal del AFIP</a> para obtener el certificado.</h3>
+                        <ol>
+                            <li>Empadronarse en la Factura Electrónica.
+                                <a href="http://www.afip.gob.ar/fe/documentos/FEMICROSITIO23022011.pps">Documentación</a>.</li>
+                            <li>Habilitar el web service de factura electrónica.</li>
+                            <li>Cargar el requerimiento que descarga de este formulario para obtener la clave certificada.</li>
+                            <li>Dar de alta un punto de ventas de tipo web service.</li>
+                            <li>Asociar la clave certificada con el punto de ventas.</li>
+                            <li>Tomar el certificado y cargarlo en este formulario.</li>
+                        </ol>
+                    </group>
+                    <separator string="Download request and Upload certificate."/>
                     <group colspan="8">
-                        <field name="request_id" widget="selection" on_change="update_data(request_id)"/>
-                        <!--field name="request_string"/-->
-                        <field name="request_file" filename="to_afip.csr"/>
-                        <!--field name="response_string"/-->
-                        <field name="response_file" filename="*.crt"/>
+                        <field name="wsafip_request_id" widget="selection" on_change="update_data(wsafip_request_id)"/>
+                        <field name="wsafip_request_file" filename="to_afip.csr"/>
+                        <field name="wsafip_response_file" filename="*.crt"/>
                     </group>
                 </group>
               </data>

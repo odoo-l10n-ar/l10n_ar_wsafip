@@ -19,6 +19,7 @@
 #
 ##############################################################################
 from openerp.osv import fields, osv
+from openerp.tools.translate import _
 import logging
 import base64
 from M2Crypto import X509
@@ -86,7 +87,7 @@ class l10n_ar_wsafip_loadcert_config(osv.osv_memory):
             certificate = self.pool.get('crypto.certificate').browse(cr, uid, certificate_id)
             v = {
                 'request_string': certificate.csr,
-                'request_file': base64.encodestring(certificate.csr),
+                'wsafip_request_file': base64.encodestring(certificate.csr),
             }
         return {'value': v}
 
@@ -95,19 +96,27 @@ class l10n_ar_wsafip_loadcert_config(osv.osv_memory):
         """
         certificate_obj = self.pool.get('crypto.certificate')
         for wz in self.browse(cr, uid, ids, context=context):
-            wz.request_id.write({'crt': wz.response_string})
-            wz.request_id.action_validate()
+            wz.wsafip_request_id.write({'crt': base64.decodestring(wz.wsafip_response_file)})
+            try:
+                wz.wsafip_request_id.have_crt(can_raise=True)
+            except X509.X509Error, e:
+                if 'Expecting: CERTIFICATE' in e[0]:
+                    raise osv.except_osv(_('Wrong Certificate file format'),
+                                         _('Be sure you have BEGIN CERTIFICATE string in your first line.'))
+                else:
+                    raise osv.except_osv(_('Unknown error'),
+                                         _('X509 return this message:\n %s')%e[0])
 
+
+            wz.wsafip_request_id.write({'state':'confirmed'})
         return True
 
     _name = 'l10n_ar_wsafip.loadcert_config'
     _inherit = 'res.config'
     _columns = {
-        'request_id': fields.many2one('crypto.certificate', 'Certificate Request', required=True),
-        'request_file': fields.binary('Download Request', readonly=True),
-        'request_string': fields.text('Certificate string', readonly=True),
-        'response_file': fields.binary('Upload Request', required=True),
-        'response_string': fields.text('Response string', required=True),
+        'wsafip_request_id': fields.many2one('crypto.certificate', 'Certificate Request', required=True),
+        'wsafip_request_file': fields.binary('Download Signed Certificate Request', readonly=True),
+        'wsafip_response_file': fields.binary('Upload Certificate', required=True),
     }
     _defaults= {
     }
