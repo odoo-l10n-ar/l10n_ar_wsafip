@@ -32,13 +32,13 @@
                 </form>
                 <group string="res_config_contents" position="replace">
                     <group colspan="8">
-                        <field name="company_id" widget="selection" on_change="update_data(company_id)"/>
-                        <field name="country_id" widget="selection"/>
-                        <field name="state_id" widget="selection"/>
-                        <field name="city"/>
-                        <field name="department"/>
-                        <field name="cuit"/>
-                        <field name="name"/>
+                        <field name="wsafip_company_id" widget="selection" on_change="update_data(wsafip_company_id)"/>
+                        <field name="wsafip_country_id" widget="selection"/>
+                        <field name="wsafip_state_id" widget="selection"/>
+                        <field name="wsafip_city"/>
+                        <field name="wsafip_department"/>
+                        <field name="wsafip_cuit"/>
+                        <field name="wsafip_name"/>
                     </group>
                 </group>
               </data>
@@ -90,8 +90,9 @@
                     <separator string="Download request and Upload certificate."/>
                     <group colspan="8">
                         <field name="wsafip_request_id" widget="selection" on_change="update_data(wsafip_request_id)"/>
-                        <field name="wsafip_request_file" filename="to_afip.csr"/>
-                        <field name="wsafip_response_file" filename="*.crt"/>
+                        <field name="wsafip_request_filename" invisible="1"/>
+                        <field name="wsafip_request_file" filename="wsafip_request_filename"/>
+                        <field name="wsafip_response_file"/>
                     </group>
                 </group>
               </data>
