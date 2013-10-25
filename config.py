@@ -58,7 +58,6 @@ class l10n_ar_wsafip_keygen_config(osv.osv_memory):
             x509_name.CN = wzr['wsafip_name'].encode('ascii', 'ignore')
             pairkey_obj.generate_keys(cr, uid, [pk_id], context=context)
             crt_ids = pairkey_obj.generate_certificate_request(cr, uid, [pk_id], x509_name, context=context)
-        return True
 
     _name = 'l10n_ar_wsafip.keygen_config'
     _inherit = 'res.config'
@@ -108,7 +107,6 @@ class l10n_ar_wsafip_loadcert_config(osv.osv_memory):
 
 
             wz.wsafip_request_id.write({'state':'confirmed'})
-        return True
 
     _name = 'l10n_ar_wsafip.loadcert_config'
     _inherit = 'res.config'
