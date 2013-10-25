@@ -20,6 +20,7 @@
 ##############################################################################
 {
     'name':     'Argentina - Base para los Web Services del AFIP',
+    'revision': '$Revision-Id$'
     'version':  '2.7.155',
     'author':   'OpenERP - Team de Localización Argentina',
     'category': 'Localization/Argentina',

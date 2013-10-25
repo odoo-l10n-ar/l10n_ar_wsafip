@@ -77,7 +77,6 @@ class l10n_ar_wsafip_keygen_config(osv.osv_memory):
     }
 l10n_ar_wsafip_keygen_config()
 
-
 class l10n_ar_wsafip_loadcert_config(osv.osv_memory):
 
     def update_data(self, cr, uid, ids, certificate_id, context=None):
