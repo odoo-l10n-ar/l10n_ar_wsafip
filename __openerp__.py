@@ -20,7 +20,6 @@
 ##############################################################################
 {
     'name':     'Argentina - Base para los Web Services del AFIP',
-    'revision': '$Revision-Id$'
     'version':  '2.7.155',
     'author':   'OpenERP - Team de Localización Argentina',
     'category': 'Localization/Argentina',
@@ -63,5 +62,4 @@ Para poder ejecutar los tests es necesario cargar la clave privada y el certific
     'active': False,
     'installable': True,
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

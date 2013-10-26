@@ -81,7 +81,7 @@
                             <li>Empadronarse en la Factura Electrónica.
                                 <a href="http://www.afip.gob.ar/fe/documentos/FEMICROSITIO23022011.pps">Documentación</a>.</li>
                             <li>Habilitar el web service de factura electrónica.</li>
-                            <li>Cargar el requerimiento que descarga de este formulario para obtener la clave certificada.</li>
+                            <li>Cargar el archivo de requerimiento en la página del AFIP.</li>
                             <li>Dar de alta un punto de ventas de tipo web service.</li>
                             <li>Asociar la clave certificada con el punto de ventas.</li>
                             <li>Tomar el certificado y cargarlo en este formulario.</li>
