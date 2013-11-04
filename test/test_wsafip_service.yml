@@ -18,7 +18,7 @@
   !record {model: wsafip.server, id: wsfe_ar_0}:
     name: Factura Electronica en Homologación
     code: wsfe
-    class: homologación
+    class: homologation
     url: https://wswhomo.afip.gov.ar/wsfe/service.asmx
 
 -
