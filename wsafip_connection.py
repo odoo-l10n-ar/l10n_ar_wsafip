@@ -140,7 +140,7 @@ class wsafip_connection(osv.osv):
         r = {}
         for auth in self.browse(cr, uid, ids):
             if auth.partner_id.document_type_id.name != 'CUIT':
-                import pdb; pdb.set_trace()
+                raise osv.except_osv(_('Error'), _('Selected partner has not CUIT. Need one to connect.'))
             r[auth.id] = {
                 'Token': auth.token.encode('ascii'),
                 'Sign': auth.sign.encode('ascii'),
