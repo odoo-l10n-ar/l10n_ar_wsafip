@@ -27,7 +27,7 @@
             <field name="inherit_id" ref="base.res_config_view_base"/>
             <field name="arch" type="xml">
               <data>
-                <form position="attributes" version="7.0">
+                <form position="attributes">
                     <attribute name="string">AFIP Web service Configuration - Request Generation</attribute>
                 </form>
                 <group string="res_config_contents" position="replace">
@@ -70,7 +70,7 @@
             <field name="inherit_id" ref="base.res_config_view_base"/>
             <field name="arch" type="xml">
               <data>
-                <form position="attributes" version="7.0">
+                <form position="attributes">
                     <attribute name="string">AFIP Web service Configuration - Load Certificate</attribute>
                 </form>
                 <group string="res_config_contents" position="replace">
