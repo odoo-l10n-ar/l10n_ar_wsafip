@@ -24,7 +24,9 @@
     'demo_xml': [],
     'depends': ['crypto'],
     'description': '\n\nConfiguraci\xc3\xb3n y API para acceder a las Web Services de la AFIP\n\n\n\nIncluye:\n\n - Wizard para instalar los claves para acceder a las Web Services.\n\n - API para realizar consultas en la Web Services desde OpenERP.\n\n\n\nEl m\xc3\xb3dulo l10n_ar_wsafip permite a OpenERP acceder a los servicios del AFIP a trav\xc3\xa9s de Web Services. Este m\xc3\xb3dulo es un servicio para administradores y programadores, donde podr\xc3\xa1n configurar el servidor, la autentificaci\xc3\xb3n y adem\xc3\xa1s tendr\xc3\xa1n acceso a una API gen\xc3\xa9rica en Python para utilizar los servicios AFIP.\n\n\n\nPara poder ejecutar los tests es necesario cargar la clave privada y el certificado al archivo test_key.yml. Tenga en cuenta que estas claves son personales y pueden traer conflicto publicarlas en los repositorios p\xc3\xbablicos.\n\n',
-    'external_dependencies': {   'python': ['suds']},
+    'external_dependencies': {
+        'python': ['suds']
+    },
     'init_xml': [],
     'installable': True,
     'license': 'AGPL-3',
