@@ -13,7 +13,7 @@ from M2Crypto.X509 import X509Error
 _logger = logging.getLogger(__name__)
 _schema = logging.getLogger(__name__ + '.schema')
 
-_login_message = """
+_login_message = """\
 <?xml version="1.0" encoding="UTF-8"?>
 <loginTicketRequest version="1.0">
 <header>
