@@ -1,0 +1,686 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* l10n_ar_wsafip_fe
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-02-11 03:29+0000\n"
+"PO-Revision-Date: 2015-02-11 03:29+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: l10n_ar_wsafip_fe
+#: view:account.journal:l10n_ar_wsafip_fe.view_account_journal_afip_form
+msgid "AFIP"
+msgstr "AFIP"
+
+#. module: l10n_ar_wsafip_fe
+#: model:res.groups,name:l10n_ar_wsafip_fe.group_wsafip_fe_admin
+msgid "AFIP Electronic Invoice Manager"
+msgstr "AFIP Electronic Invoice Manager"
+
+#. module: l10n_ar_wsafip_fe
+#: model:res.groups,name:l10n_ar_wsafip_fe.group_wsafip_fe_user
+msgid "AFIP Electronic Invoice User"
+msgstr "AFIP Electronic Invoice User"
+
+#. module: l10n_ar_wsafip_fe
+#: field:account.invoice,afip_error_id:0
+msgid "AFIP Status"
+msgstr "AFIP Status"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/invoice.py:211
+#: code:addons/l10n_ar_wsafip_fe/invoice.py:261
+#, python-format
+msgid "AFIP Validation Error"
+msgstr "AFIP Validation Error"
+
+#. module: l10n_ar_wsafip_fe
+#: view:account.invoice:l10n_ar_wsafip_fe.view_invoice_form
+msgid "AFIP Web Service"
+msgstr "AFIP Web Service"
+
+#. module: l10n_ar_wsafip_fe
+#: view:l10n_ar_wsafip_fe.config:l10n_ar_wsafip_fe.view_wsafip_fe_config
+msgid "AFIP Web service Configuration - Request Generation"
+msgstr "AFIP Web service Configuration - Request Generation"
+
+#. module: l10n_ar_wsafip_fe
+#: view:afip.wsfe_error:l10n_ar_wsafip_fe.view_wsfe_error_form
+#: view:afip.wsfe_error:l10n_ar_wsafip_fe.view_wsfe_error_tree
+msgid "AFIP Web service Error"
+msgstr "AFIP Web service Error"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:114
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:154
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:199
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:244
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:287
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:329
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:383
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:386
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:392
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:435
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:491
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:495
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:561
+#, python-format
+msgid "AFIP Web service error"
+msgstr "AFIP Web service error"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:506
+#, python-format
+msgid "AFIP error"
+msgstr "AFIP error"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.invoice,afip_result:0
+msgid "Accepted"
+msgstr "Accepted"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Amount"
+msgstr "Importe"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.journal,afip_state:0
+msgid "Application service has troubles"
+msgstr "Application service has troubles"
+
+#. module: l10n_ar_wsafip_fe
+#: view:account.config.settings:l10n_ar_wsafip_fe.view_account_config_settings
+msgid "Associate point of sale to AFIP electronic invoice"
+msgstr "Associate point of sale to AFIP electronic invoice"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.journal,afip_state:0
+msgid "Authentication service is down"
+msgstr "Authentication service is down"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Base"
+msgstr "Base"
+
+#. module: l10n_ar_wsafip_fe
+#: field:account.invoice,afip_batch_number:0
+msgid "Batch Number"
+msgstr "Batch Number"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:l10n_ar_wsafip_fe.query_invoices,update_domain:0
+msgid "By invoice number"
+msgstr "By invoice number"
+
+#. module: l10n_ar_wsafip_fe
+#: field:account.invoice,afip_cae_due:0
+msgid "CAE due"
+msgstr "CAE due"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "CAE due:"
+msgstr "CAE due:"
+
+#. module: l10n_ar_wsafip_fe
+#: field:account.invoice,afip_cae:0
+msgid "CAE number"
+msgstr "CAE number"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "CAE:"
+msgstr "CAE:"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/invoice.py:211
+#, python-format
+msgid "Can't find invoice number. Please check the journal sequence prefix and suffix are not breaking the number generator."
+msgstr "Can't find invoice number. Please check the journal sequence prefix and suffix are not breaking the number generator."
+
+#. module: l10n_ar_wsafip_fe
+#: view:l10n_ar_wsafip_fe.query_invoices:l10n_ar_wsafip_fe.l10n_ar_wsafip_fe_update_invoice
+#: view:l10n_ar_wsafip_fe.validate_invoices:l10n_ar_wsafip_fe.l10n_ar_wsafip_fe_validate_invoice
+msgid "Cancel"
+msgstr "Cancel"
+
+#. module: l10n_ar_wsafip_fe
+#: field:l10n_ar_wsafip_fe.config,wsfe_certificate_id:0
+msgid "Certificate"
+msgstr "Certificate"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Cliente"
+msgstr "Cliente"
+
+#. module: l10n_ar_wsafip_fe
+#: field:afip.wsfe_error,code:0
+msgid "Code"
+msgstr "Code"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Comment:"
+msgstr "Comentario:"
+
+#. module: l10n_ar_wsafip_fe
+#: field:l10n_ar_wsafip_fe.config,company_id:0
+msgid "Company"
+msgstr "Company"
+
+#. module: l10n_ar_wsafip_fe
+#: help:account.journal,afip_items_generated:0
+msgid "Connect to the AFIP and check how many invoices was generated."
+msgstr "Connect to the AFIP and check how many invoices was generated."
+
+#. module: l10n_ar_wsafip_fe
+#: help:account.journal,afip_state:0
+msgid "Connect to the AFIP and check service status."
+msgstr "Connect to the AFIP and check service status."
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.journal,afip_state:0
+msgid "Connected"
+msgstr "Connected"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.journal,afip_state:0
+msgid "Connection Error"
+msgstr "Connection Error"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.journal,afip_state:0
+msgid "Connection reseted by host"
+msgstr "Connection reseted by host"
+
+#. module: l10n_ar_wsafip_fe
+#: field:account.journal,afip_state:0
+msgid "Connection state"
+msgstr "Connection state"
+
+#. module: l10n_ar_wsafip_fe
+#: view:l10n_ar_wsafip_fe.query_invoices:l10n_ar_wsafip_fe.l10n_ar_wsafip_fe_update_invoice
+#: view:l10n_ar_wsafip_fe.validate_invoices:l10n_ar_wsafip_fe.l10n_ar_wsafip_fe_validate_invoice
+msgid "Create and Update Invoices with AFIP"
+msgstr "Create and Update Invoices with AFIP"
+
+#. module: l10n_ar_wsafip_fe
+#: field:l10n_ar_wsafip_fe.query_invoices,create_invoices:0
+msgid "Create invoice in draft if not exists"
+msgstr "Create invoice in draft if not exists"
+
+#. module: l10n_ar_wsafip_fe
+#: field:afip.wsfe_error,create_uid:0
+#: field:l10n_ar_wsafip_fe.config,create_uid:0
+#: field:l10n_ar_wsafip_fe.query_invoices,create_uid:0
+#: field:l10n_ar_wsafip_fe.validate_invoices,create_uid:0
+msgid "Created by"
+msgstr "Created by"
+
+#. module: l10n_ar_wsafip_fe
+#: field:afip.wsfe_error,create_date:0
+#: field:l10n_ar_wsafip_fe.config,create_date:0
+#: field:l10n_ar_wsafip_fe.query_invoices,create_date:0
+#: field:l10n_ar_wsafip_fe.validate_invoices,create_date:0
+msgid "Created on"
+msgstr "Created on"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.journal,afip_state:0
+msgid "Database service is down"
+msgstr "Database service is down"
+
+#. module: l10n_ar_wsafip_fe
+#: model:res.company,overdue_msg:l10n_ar_wsafip_fe.com_ivae
+#: model:res.company,overdue_msg:l10n_ar_wsafip_fe.com_ivanr
+#: model:res.company,overdue_msg:l10n_ar_wsafip_fe.com_ivari
+#: model:res.company,overdue_msg:l10n_ar_wsafip_fe.com_ivari2
+#: model:res.company,overdue_msg:l10n_ar_wsafip_fe.com_ivarni
+#: model:res.company,overdue_msg:l10n_ar_wsafip_fe.com_rm
+msgid "Dear Sir/Madam,\n"
+"\n"
+"Our records indicate that some payments on your account are still due. Please find details below.\n"
+"If the amount has already been paid, please disregard this notice. Otherwise, please forward us the total amount stated below.\n"
+"If you have any queries regarding your account, Please contact us.\n"
+"\n"
+"Thank you in advance for your cooperation.\n"
+"Best Regards,"
+msgstr "Estimado/a señor/señora,Nuestros registros indican que algunos pagos en nuestra cuenta están aún pendientes. Puede encontrar los detalles a continuación.Si la cantidad ya ha sido pagada, por favor, descarte esta notificación. En otro caso, por favor remítanos el importe total abajo indicado.Si tiene alguna pregunta con respecto a su cuenta, por favor contáctenos.Gracias de antemano por su colaboración.Saludos Cordiales,"
+
+#. module: l10n_ar_wsafip_fe
+#: field:afip.wsfe_error,description:0
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Description"
+msgstr "Descripción"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Dirección"
+msgstr "Dirección"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Discount (%)"
+msgstr "Descuento (%)"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.actions.act_window,name:l10n_ar_wsafip_fe.action_wsafip_fe_config
+msgid "Electronic Invoice Configuration"
+msgstr "Electronic Invoice Configuration"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.actions.act_window,name:l10n_ar_wsafip_fe.act_wsfe_error
+#: model:ir.ui.menu,name:l10n_ar_wsafip_fe.menu_action_wsfe_error
+msgid "Electronic Invoice Errors"
+msgstr "Electronic Invoice Errors"
+
+#. module: l10n_ar_wsafip_fe
+#: view:l10n_ar_wsafip_fe.query_invoices:l10n_ar_wsafip_fe.l10n_ar_wsafip_fe_update_invoice
+#: view:l10n_ar_wsafip_fe.validate_invoices:l10n_ar_wsafip_fe.l10n_ar_wsafip_fe_validate_invoice
+msgid "Execute"
+msgstr "Execute"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Factura N°"
+msgstr "Factura N°"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Fecha y Hora"
+msgstr "Fecha y Hora"
+
+#. module: l10n_ar_wsafip_fe
+#: field:l10n_ar_wsafip_fe.query_invoices,first_invoice_number:0
+#: field:l10n_ar_wsafip_fe.validate_invoices,first_invoice_number:0
+msgid "First invoice number"
+msgstr "First invoice number"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Fiscal Position:"
+msgstr "Posición fiscal"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.actions.act_window,name:l10n_ar_wsafip_fe.action_l10n_ar_wsafip_fe_validate_invoice
+#: model:ir.model,name:l10n_ar_wsafip_fe.model_l10n_ar_wsafip_fe_validate_invoices
+msgid "Generate CAE from validated invoices"
+msgstr "Generate CAE from validated invoices"
+
+#. module: l10n_ar_wsafip_fe
+#: field:afip.wsfe_error,id:0
+#: field:l10n_ar_wsafip_fe.config,id:0
+#: field:l10n_ar_wsafip_fe.query_invoices,id:0
+#: field:l10n_ar_wsafip_fe.validate_invoices,id:0
+msgid "ID"
+msgstr "ID"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Ing. Brutos"
+msgstr "Ing. Brutos"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Inicio Actividades"
+msgstr "Inicio Actividades"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.model,name:l10n_ar_wsafip_fe.model_account_invoice
+msgid "Invoice"
+msgstr "Factura"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wizard/query_invoices.py:177
+#: model:ir.actions.report.xml,name:l10n_ar_wsafip_fe.l10n_ar_wsafip_fe_invoices
+#, python-format
+msgid "Invoices"
+msgstr "Facturas"
+
+#. module: l10n_ar_wsafip_fe
+#: field:l10n_ar_wsafip_fe.config,wsfe_for_homologation:0
+msgid "Is for homologation"
+msgstr "Is for homologation"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.model,name:l10n_ar_wsafip_fe.model_account_journal
+#: field:l10n_ar_wsafip_fe.query_invoices,journal_id:0
+#: field:l10n_ar_wsafip_fe.validate_invoices,journal_id:0
+msgid "Journal"
+msgstr "Diario"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/invoice.py:69
+#, python-format
+msgid "La AFIP espera que el próximo número de secuencia sea %i, pero el sistema indica que será %i. Hable inmediatamente con su administrador del sistema para resolver este problema."
+msgstr "La AFIP espera que el próximo número de secuencia sea %i, pero el sistema indica que será %i. Hable inmediatamente con su administrador del sistema para resolver este problema."
+
+#. module: l10n_ar_wsafip_fe
+#: field:afip.wsfe_error,write_uid:0
+#: field:l10n_ar_wsafip_fe.config,write_uid:0
+#: field:l10n_ar_wsafip_fe.query_invoices,write_uid:0
+#: field:l10n_ar_wsafip_fe.validate_invoices,write_uid:0
+msgid "Last Updated by"
+msgstr "Last Updated by"
+
+#. module: l10n_ar_wsafip_fe
+#: field:afip.wsfe_error,write_date:0
+#: field:l10n_ar_wsafip_fe.config,write_date:0
+#: field:l10n_ar_wsafip_fe.query_invoices,write_date:0
+#: field:l10n_ar_wsafip_fe.validate_invoices,write_date:0
+msgid "Last Updated on"
+msgstr "Last Updated on"
+
+#. module: l10n_ar_wsafip_fe
+#: field:l10n_ar_wsafip_fe.query_invoices,last_invoice_number:0
+#: field:l10n_ar_wsafip_fe.validate_invoices,last_invoice_number:0
+msgid "Last invoice number"
+msgstr "Last invoice number"
+
+#. module: l10n_ar_wsafip_fe
+#: field:afip.wsfe_error,name:0
+msgid "Name"
+msgstr "Name"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:l10n_ar_wsafip_fe.query_invoices,update_domain:0
+msgid "Nearest draft invoice"
+msgstr "Nearest draft invoice"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.journal,afip_state:0
+msgid "Network is down"
+msgstr "Network is down"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.invoice,afip_result:0
+msgid "No CAE"
+msgstr "No CAE"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.journal,afip_state:0
+msgid "Not identified error"
+msgstr "Not identified error"
+
+#. module: l10n_ar_wsafip_fe
+#: field:account.journal,afip_items_generated:0
+msgid "Number of Invoices Generated"
+msgstr "Number of Invoices Generated"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.actions.server,name:l10n_ar_wsafip_fe.action_server_wsfe_update_optional
+msgid "Optional Types"
+msgstr "Optional Types"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wizard/query_invoices.py:153
+#, python-format
+msgid "Partner has not set a receivable account"
+msgstr "Partner has not set a receivable account"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Payment Term:"
+msgstr "Plazo de pago:"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/invoice.py:126
+#, python-format
+msgid "Please, check if you set tax code for invoice or refund to tax %s."
+msgstr "Please, check if you set tax code for invoice or refund to tax %s."
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wizard/query_invoices.py:86
+#, python-format
+msgid "Please, first invoice number must be less than last invoice"
+msgstr "Please, first invoice number must be less than last invoice"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wizard/query_invoices.py:153
+#, python-format
+msgid "Please, first set the receivable account for %s"
+msgstr "Please, first set the receivable account for %s"
+
+#. module: l10n_ar_wsafip_fe
+#: field:l10n_ar_wsafip_fe.config,wsfe_point_of_sale:0
+msgid "Point of Sale"
+msgstr "Point of Sale"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/config.py:52
+#, python-format
+msgid "Point of sale %i"
+msgstr "Point of sale %i"
+
+#. module: l10n_ar_wsafip_fe
+#: model:product.template,name:l10n_ar_wsafip_fe.prod_iva0_product_template
+msgid "Producto IVA 0%"
+msgstr "Producto IVA 0%"
+
+#. module: l10n_ar_wsafip_fe
+#: model:product.template,name:l10n_ar_wsafip_fe.prod_iva10_product_template
+msgid "Producto IVA 10.5%"
+msgstr "Producto IVA 10.5%"
+
+#. module: l10n_ar_wsafip_fe
+#: model:product.template,name:l10n_ar_wsafip_fe.prod_iva21_product_template
+msgid "Producto IVA 21%"
+msgstr "Producto IVA 21%"
+
+#. module: l10n_ar_wsafip_fe
+#: model:product.template,name:l10n_ar_wsafip_fe.prod_iva27_product_template
+msgid "Producto IVA 27%"
+msgstr "Producto IVA 27%"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wizard/query_invoices.py:86
+#, python-format
+msgid "Qrong invoice range numbers"
+msgstr "Qrong invoice range numbers"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Quantity"
+msgstr "Cantidad"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.model,name:l10n_ar_wsafip_fe.model_l10n_ar_wsafip_fe_query_invoices
+msgid "Query for invoices in AFIP web services"
+msgstr "Query for invoices in AFIP web services"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.invoice,afip_result:0
+msgid "Rejected"
+msgstr "Rejected"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Remito N°"
+msgstr "Remito N°"
+
+#. module: l10n_ar_wsafip_fe
+#: view:l10n_ar_wsafip_fe.query_invoices:l10n_ar_wsafip_fe.l10n_ar_wsafip_fe_update_invoice
+#: view:l10n_ar_wsafip_fe.validate_invoices:l10n_ar_wsafip_fe.l10n_ar_wsafip_fe_validate_invoice
+msgid "Select Journal and range of invoices to query"
+msgstr "Select Journal and range of invoices to query"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.journal,afip_state:0
+msgid "Services are down"
+msgstr "Services are down"
+
+#. module: l10n_ar_wsafip_fe
+#: field:account.invoice,afip_result:0
+msgid "Status"
+msgstr "Status"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:507
+#, python-format
+msgid "Stupid error:\n"
+"%s"
+msgstr "Stupid error:%s"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/invoice.py:68
+#, python-format
+msgid "Syncronization Error"
+msgstr "Syncronization Error"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:115
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:155
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:200
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:245
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:288
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:330
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:393
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:496
+#, python-format
+msgid "System return error %i: %s"
+msgstr "System return error %i: %s"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:436
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:562
+#, python-format
+msgid "System return error %i: %s\n"
+"Pueda que esté intente realizar esta operacióndesde el servidor de homologación.Intente desde el servidor de producción."
+msgstr "System return error %i: %sPueda que esté intente realizar esta operacióndesde el servidor de homologación.Intente desde el servidor de producción."
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:492
+#, python-format
+msgid "System return error: %s"
+msgstr "System return error: %s"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:384
+#: code:addons/l10n_ar_wsafip_fe/wsafip_server.py:387
+#, python-format
+msgid "System return: %s"
+msgstr "System return: %s"
+
+#. module: l10n_ar_wsafip_fe
+#: code:addons/l10n_ar_wsafip_fe/invoice.py:125
+#, python-format
+msgid "TAX without tax-code"
+msgstr "TAX without tax-code"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Tax"
+msgstr "Impuestos"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Taxes"
+msgstr "Impuestos"
+
+#. module: l10n_ar_wsafip_fe
+#: help:account.invoice,afip_result:0
+msgid "This state is asigned by the AFIP. If * No CAE * state mean you have no generate this invoice by "
+msgstr "This state is asigned by the AFIP. If * No CAE * state mean you have no generate this invoice by "
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Total"
+msgstr "Total"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Total Without Taxes"
+msgstr "Total sin impuestos"
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "Unit Price"
+msgstr "Precio unitario"
+
+#. module: l10n_ar_wsafip_fe
+#: selection:account.journal,afip_state:0
+msgid "Unknown service"
+msgstr "Unknown service"
+
+#. module: l10n_ar_wsafip_fe
+#: field:l10n_ar_wsafip_fe.query_invoices,update_invoices:0
+msgid "Update CAE if invoice exists"
+msgstr "Update CAE if invoice exists"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.actions.server,name:l10n_ar_wsafip_fe.action_server_wsfe_update_afip_concept_type
+msgid "Update Concept"
+msgstr "Update Concept"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.actions.server,name:l10n_ar_wsafip_fe.action_server_wsfe_update_currency
+msgid "Update Currency"
+msgstr "Update Currency"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.actions.server,name:l10n_ar_wsafip_fe.action_server_wsfe_update_document_type
+msgid "Update Document Type"
+msgstr "Update Document Type"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.actions.server,name:l10n_ar_wsafip_fe.action_server_wsfe_update_journal_class
+msgid "Update Journal Class"
+msgstr "Update Journal Class"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.actions.server,name:l10n_ar_wsafip_fe.action_server_wsfe_update_tax
+msgid "Update Taxes"
+msgstr "Update Taxes"
+
+#. module: l10n_ar_wsafip_fe
+#: model:ir.actions.act_window,name:l10n_ar_wsafip_fe.action_l10n_ar_wsafip_fe_update_invoice
+msgid "Update and Create Invoices from AFIP"
+msgstr "Update and Create Invoices from AFIP"
+
+#. module: l10n_ar_wsafip_fe
+#: field:l10n_ar_wsafip_fe.query_invoices,update_domain:0
+msgid "Update relation"
+msgstr "Update relation"
+
+#. module: l10n_ar_wsafip_fe
+#: field:account.journal,afip_connection_id:0
+msgid "Web Service connection"
+msgstr "Web Service connection"
+
+#. module: l10n_ar_wsafip_fe
+#: view:account.journal:l10n_ar_wsafip_fe.view_account_journal_afip_form
+msgid "Web Services"
+msgstr "Web Services"
+
+#. module: l10n_ar_wsafip_fe
+#: help:account.journal,afip_connection_id:0
+msgid "Which connection must be used to use AFIP services."
+msgstr "Which connection must be used to use AFIP services."
+
+#. module: l10n_ar_wsafip_fe
+#: view:website:l10n_ar_wsafip_fe.report_invoice_document
+msgid "cod."
+msgstr "cod."
+
+#. module: l10n_ar_wsafip_fe
+#: view:l10n_ar_wsafip_fe.query_invoices:l10n_ar_wsafip_fe.l10n_ar_wsafip_fe_update_invoice
+#: view:l10n_ar_wsafip_fe.validate_invoices:l10n_ar_wsafip_fe.l10n_ar_wsafip_fe_validate_invoice
+msgid "or"
+msgstr "or"
+
+#. module: l10n_ar_wsafip_fe
+#: view:l10n_ar_wsafip_fe.config:l10n_ar_wsafip_fe.view_wsafip_fe_config
+msgid "res_config_contents"
+msgstr "res_config_contents"
+

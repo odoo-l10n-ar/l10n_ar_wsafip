@@ -1,0 +1,17 @@
+- Prepare http controllers to prevent errors
+- !python {model: account.invoice}: |
+    import urllib
+    import time
+    urllib.urlopen('http://localhost:8069/')
+    time.sleep(3)
+
+- Print invoice
+- !python {model: account.invoice}: |
+    import os
+    import openerp.report
+    from openerp import tools
+    data, format = openerp.report.render_report(cr, uid, [ref('inv_ri2ri')], 'l10n_ar_wsafip_fe.report_invoice', {}, {})
+    if tools.config['test_report_directory']:
+       file(os.path.join(tools.config['test_report_directory'], 'account-e-invoice.ri2ri.'+format), 'wb+').write(data)
+
+
