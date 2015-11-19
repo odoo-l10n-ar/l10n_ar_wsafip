@@ -53,8 +53,8 @@ msgid "AFIP Web service Configuration - Request Generation"
 msgstr "AFIP Web service Configuration - Request Generation"
 
 #. module: l10n_ar_wsafip_fe
-#: view:afip.wsfe_error:l10n_ar_wsafip_fe.view_wsfe_error_form
-#: view:afip.wsfe_error:l10n_ar_wsafip_fe.view_wsfe_error_tree
+#: view:wsafip.error:l10n_ar_wsafip_fe.view_wsfe_error_form
+#: view:wsafip.error:l10n_ar_wsafip_fe.view_wsfe_error_tree
 msgid "AFIP Web service Error"
 msgstr "AFIP Web service Error"
 
@@ -165,7 +165,7 @@ msgid "Cliente"
 msgstr "Cliente"
 
 #. module: l10n_ar_wsafip_fe
-#: field:afip.wsfe_error,code:0
+#: field:wsafip.error,code:0
 msgid "Code"
 msgstr "Code"
 
@@ -221,7 +221,7 @@ msgid "Create invoice in draft if not exists"
 msgstr "Create invoice in draft if not exists"
 
 #. module: l10n_ar_wsafip_fe
-#: field:afip.wsfe_error,create_uid:0
+#: field:wsafip.error,create_uid:0
 #: field:l10n_ar_wsafip_fe.config,create_uid:0
 #: field:l10n_ar_wsafip_fe.query_invoices,create_uid:0
 #: field:l10n_ar_wsafip_fe.validate_invoices,create_uid:0
@@ -229,7 +229,7 @@ msgid "Created by"
 msgstr "Created by"
 
 #. module: l10n_ar_wsafip_fe
-#: field:afip.wsfe_error,create_date:0
+#: field:wsafip.error,create_date:0
 #: field:l10n_ar_wsafip_fe.config,create_date:0
 #: field:l10n_ar_wsafip_fe.query_invoices,create_date:0
 #: field:l10n_ar_wsafip_fe.validate_invoices,create_date:0
@@ -259,7 +259,7 @@ msgid "Dear Sir/Madam,\n"
 msgstr "Estimado/a señor/señora,Nuestros registros indican que algunos pagos en nuestra cuenta están aún pendientes. Puede encontrar los detalles a continuación.Si la cantidad ya ha sido pagada, por favor, descarte esta notificación. En otro caso, por favor remítanos el importe total abajo indicado.Si tiene alguna pregunta con respecto a su cuenta, por favor contáctenos.Gracias de antemano por su colaboración.Saludos Cordiales,"
 
 #. module: l10n_ar_wsafip_fe
-#: field:afip.wsfe_error,description:0
+#: field:wsafip.error,description:0
 #: view:website:l10n_ar_wsafip_fe.report_invoice_document
 msgid "Description"
 msgstr "Descripción"
@@ -319,7 +319,7 @@ msgid "Generate CAE from validated invoices"
 msgstr "Generate CAE from validated invoices"
 
 #. module: l10n_ar_wsafip_fe
-#: field:afip.wsfe_error,id:0
+#: field:wsafip.error,id:0
 #: field:l10n_ar_wsafip_fe.config,id:0
 #: field:l10n_ar_wsafip_fe.query_invoices,id:0
 #: field:l10n_ar_wsafip_fe.validate_invoices,id:0
@@ -367,7 +367,7 @@ msgid "La AFIP espera que el próximo número de secuencia sea %i, pero el siste
 msgstr "La AFIP espera que el próximo número de secuencia sea %i, pero el sistema indica que será %i. Hable inmediatamente con su administrador del sistema para resolver este problema."
 
 #. module: l10n_ar_wsafip_fe
-#: field:afip.wsfe_error,write_uid:0
+#: field:wsafip.error,write_uid:0
 #: field:l10n_ar_wsafip_fe.config,write_uid:0
 #: field:l10n_ar_wsafip_fe.query_invoices,write_uid:0
 #: field:l10n_ar_wsafip_fe.validate_invoices,write_uid:0
@@ -375,7 +375,7 @@ msgid "Last Updated by"
 msgstr "Last Updated by"
 
 #. module: l10n_ar_wsafip_fe
-#: field:afip.wsfe_error,write_date:0
+#: field:wsafip.error,write_date:0
 #: field:l10n_ar_wsafip_fe.config,write_date:0
 #: field:l10n_ar_wsafip_fe.query_invoices,write_date:0
 #: field:l10n_ar_wsafip_fe.validate_invoices,write_date:0
@@ -389,7 +389,7 @@ msgid "Last invoice number"
 msgstr "Last invoice number"
 
 #. module: l10n_ar_wsafip_fe
-#: field:afip.wsfe_error,name:0
+#: field:wsafip.error,name:0
 msgid "Name"
 msgstr "Name"
 
