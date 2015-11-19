@@ -1,0 +1,50 @@
+div#factura {
+width: 100%;
+display: table;
+}
+
+div#clase_documento {
+position: absolute;
+right: 45%;
+border: 1px solid black;
+background: white;
+width: 10%;
+text-align: center;
+vertical-align: middle;
+}
+
+.afiprow {
+display: table-row;
+}
+
+.afipleft {
+display: table-cell;
+border: 1px solid black;
+width: 50%;
+padding: 5px 6% 5px 5px;
+vertical-align: middle;
+}
+
+.afipright {
+display: table-cell;
+border: 1px solid black;
+width: 50%;
+padding: 5px 5px 5px 6%;
+vertical-align: middle;
+}
+
+div.afipfield {
+overflow: auto;
+}
+
+div.afipfield label {
+padding-right: 6px;
+}
+
+div.afipfield label::after {
+content: ':';
+}
+
+div.afipfield * {
+float: left;
+}

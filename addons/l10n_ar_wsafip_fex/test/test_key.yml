@@ -1,0 +1,78 @@
+-
+ # Clave privada y Certificado asignado por AFIP.
+ 
+ # En este registro hay que cargar la clave de testing de Homologacion
+ # recibido desde la AFIP. Ver última sección de:
+ 
+ # http://www.afip.gob.ar/ws/WSAA/WSAA.ObtenerCertificado.pdf
+ 
+ # Nota: Para el caso del entorno de Testing, envíelo por e-mail a webservices@afip.gov.ar 
+ #      aclarando a qué WS "de negocio" (por ej.: "wsfe", "wsseg", etc.)
+ #      pretende acceder usando este certificado. El certificado le será devuelto por e-mail.
+ 
+ Private key
+-
+  !record {model: crypto.pairkey, id: pkey_ar_0}:
+    name: Clave de Homologacion (Testing)
+    state: confirmed
+    key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIICXQIBAAKBgQC7dnRpsafWh6qlFm1akFdV5U1RFGqxbh7+vmplZFP/nxQ1ov9T
+        6ShCdrWnAgAg8rF5fo6CHk8rpxNTdwtfh6TNnI5tvxBAZ4zKmzvfMLHUgCIOnpqH
+        hvQF6jYc4q39jCJ+3GrHGJmi1COIT9qXAfJ/RO127HwRhP+n2hBdndZzWQIDAQAB
+        AoGBALRvR42UGeA7pNxRwd+xnt5mXwzzgd5WCC9aSD5fWxpnm6Qkx22UtdODP0UI
+        f+c2sewnDDPhyIJTxh5ILwI8JTq7hfFZChKVqDMGSGDap4/d70c8PfNsRBdS7Mj7
+        bnV1vRk4mkiIAqSQxE6UVvsgOry9N44tGkFrpnkucORXji6BAkEA7lvGPRXtaXKJ
+        GAPPJBMHtdLV2tYsqZmG9Eg723flR0boXPmGa2zv2BUyiI/JroGycBSNS6fQZktP
+        v2C9lDarpQJBAMlWWRKBd+iIiuS8NKjQ4sfH0IhEVw6bgx7SElge4KLvl3LdEepD
+        miI7uec3hN0LD895Dp8S/G3LNq0R7EzR6qUCQDhq0Ik033TN/1UH0cegGXsX5DZf
+        60JZbG/1iPVxc3tjdSxMg1x59GsY2VUpc3syh6Gvu6HknpcXzFBn/XdPWWECQFl+
+        a0thhzYyc2KnEdU0PInHFLdtgTD6CTeK8yJ+XyWt0Cj7gTobYIj0+XaAZCuI/jcf
+        vVMSMmhvWtdlTx76dA0CQQC7XsEDOkIMoJ4axz6w52XHt0G9V+Qsw5LPWmt5ST/V
+        fMjtofZyGQ3mXwGV/5y1HnMZMDw0tV1uID8spTbyS93q
+        -----END RSA PRIVATE KEY-----
+
+
+-
+ Certificate
+-
+  !record {model: crypto.certificate, id: cert_ar_0}:
+    name: Certificado de Homologacion (Testing)
+    state: confirmed
+    pairkey_id: pkey_ar_0
+    csr: |
+        -----BEGIN CERTIFICATE REQUEST-----
+        MIIBhzCB8QIBADBIMQswCQYDVQQGEwJBUjEPMA0GA1UECgwGTW9sZGVvMQ0wCwYD
+        VQQDDARPZG9vMRkwFwYDVQQFExBDVUlUIDMwNzEyMDA3Mjg4MIGfMA0GCSqGSIb3
+        DQEBAQUAA4GNADCBiQKBgQC7dnRpsafWh6qlFm1akFdV5U1RFGqxbh7+vmplZFP/
+        nxQ1ov9T6ShCdrWnAgAg8rF5fo6CHk8rpxNTdwtfh6TNnI5tvxBAZ4zKmzvfMLHU
+        gCIOnpqHhvQF6jYc4q39jCJ+3GrHGJmi1COIT9qXAfJ/RO127HwRhP+n2hBdndZz
+        WQIDAQABoAAwDQYJKoZIhvcNAQELBQADgYEAa2QpZZs83jmWjbiHqFn3dMo3VN0v
+        9iK1Ztdn7uHEG4UVY0Gb2wHC/47sS3cmBhuQhbIhVBydRka4p7/1qRR8NkfKYbRi
+        6pGMXBD3bVCzeaYc+V0/DCWnrl0x0ZKU3/U65G2lH5umX425aYX0lqIwI62bNq8K
+        2rRk5IDDJqO92L8=
+        -----END CERTIFICATE REQUEST-----
+    crt: |
+        -----BEGIN CERTIFICATE-----
+        MIID2jCCAsKgAwIBAgIIWrxPVGqUsTowDQYJKoZIhvcNAQEFBQAwQzElMCMGA1UE
+        AwwcQUZJUCBUZXN0aW5nIENvbXB1dGFkb3JlcyBDQTENMAsGA1UECgwEQUZJUDEL
+        MAkGA1UEBhMCQVIwHhcNMTUwMjA5MjA1NzUzWhcNMTcxMTA1MjA1NzUzWjB4MREw
+        DwYDVQQDDAhweUFGSVB3czEZMBcGA1UEBRMQQ1VJVCAzMDcxMjAwNzI4ODE7MDkG
+        A1UECgwyQ29vcGVyYXRpdmEgZGUgVHJhYmFqbyBNb2xkZW8gSW50ZXJhY3RpdmUg
+        TGltaXRhZGExCzAJBgNVBAYTAkFSMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKB
+        gQC7dnRpsafWh6qlFm1akFdV5U1RFGqxbh7+vmplZFP/nxQ1ov9T6ShCdrWnAgAg
+        8rF5fo6CHk8rpxNTdwtfh6TNnI5tvxBAZ4zKmzvfMLHUgCIOnpqHhvQF6jYc4q39
+        jCJ+3GrHGJmi1COIT9qXAfJ/RO127HwRhP+n2hBdndZzWQIDAQABo4IBHzCCARsw
+        DAYDVR0TAQH/BAIwADAOBgNVHQ8BAf8EBAMCBeAwHQYDVR0OBBYEFLTpfrZ1av5W
+        0ECX7qcEcUxxiIIPMB8GA1UdIwQYMBaAFER07rScJt9W4cEN61cLkBk2PZYBMIG6
+        BgNVHSAEgbIwga8wgawGDisGAQQBgbtjAQIBAgEBMIGZMIGWBggrBgEFBQcCAjCB
+        iR6BhgBDAGUAcgB0AGkAZgBpAGMAYQBkAG8AIABwAGEAcgBhACAAYwBvAG0AcAB1
+        AHQAYQBkAG8AcgBlAHMAIABzAG8AbABvACAAdgBhAGwAaQBkAG8AIABlAG4AIABl
+        AG4AdABvAHIAbgBvAHMAIABkAGUAIABkAGUAcwBhAHIAcgBvAGwAbABvMA0GCSqG
+        SIb3DQEBBQUAA4IBAQBwL2PWH1CWIUhxFxwtBqTwQ9Ch5k9PZXdfaePC3IljCaLJ
+        xGibB/ikua6oc1LNG08WwRCPV5bsHeR7rNpOzh1CdHT69No47V49MxNpKwaidFVg
+        5webvx/3mCdAdIepWLOd08L8tFE91PsdQFfkzXVCGk/o6+ezsaJI7gfpAKjA5Po2
+        4NbQ+1uFjYk4CBippCTmnSkm8J5aNPkV5hZKgFkgMXrnJRt5WsY+nc/tGK7cH/PO
+        4MRj2teFqmaZ1eJdQYabrco8sxYiP3HMqEo17lANu7BEbsSNDkBRj7akOs98NFkD
+        cg2P1tvpXUcgWEOPh+iJo7HDwcP36zylwRQXt+OP
+        -----END CERTIFICATE-----
