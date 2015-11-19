@@ -35,6 +35,7 @@
           'data/wsafip_menuitem.xml',
           'data/wsafip_connection_view.xml',
           'data/wsafip_server_view.xml',
+          'data/wsafip_error_view.xml',
           'data/wsafip_config.xml',
           'security/wsafip_security.xml',
           'security/ir.model.access.csv'],

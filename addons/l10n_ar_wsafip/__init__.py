@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import wsafip_server
+import wsafip_error
 import wsafip_connection
 import config
 

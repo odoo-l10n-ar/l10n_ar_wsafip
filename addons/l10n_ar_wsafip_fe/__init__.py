@@ -2,7 +2,6 @@
 
 import config
 import wsafip_server
-import wsfe_error
 import invoice
 import journal
 import wizard
