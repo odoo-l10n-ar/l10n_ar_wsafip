@@ -51,7 +51,7 @@ class l10n_ar_wsafip_fe_config(osv.osv_memory):
         for ws in self.browse(cr, uid, ids):
             # Tomamos la compania
             company = ws.company_id
-            conn_class = 'homologation' \
+            conn_category = 'homologation' \
                 if ws.wsfe_for_homologation else 'production'
 
             # Hay que crear la autorizacion para el servicio si no existe.
@@ -61,7 +61,7 @@ class l10n_ar_wsafip_fe_config(osv.osv_memory):
             if len(conn_ids) == 0:
                 # Hay que crear la secuencia de proceso en batch si no existe.
                 seq_ids = sequence_obj.search(
-                    cr, uid, [('code', '=', 'wsafip_fe_sequence')])
+                    cr, uid, [('code', '=', 'ws_afip_sequence')])
                 if seq_ids:
                     seq_id = seq_ids[0]
                 else:
@@ -76,13 +76,15 @@ class l10n_ar_wsafip_fe_config(osv.osv_memory):
                     'AFIP Sequence Authorization Invoice: %s' % company.name,
                     'partner_id': company.partner_id.id,
                     'logging_id':
-                    afipserver_obj.search(cr, uid,
-                                          [('code', '=', 'wsaa'),
-                                           ('class', '=', conn_class)])[0],
+                    afipserver_obj.search(
+                        cr, uid,
+                        [('code', '=', 'wsaa'),
+                         ('category', '=', conn_category)])[0],
                     'server_id':
-                    afipserver_obj.search(cr, uid,
-                                          [('code', '=', 'wsfe'),
-                                           ('class', '=', conn_class)])[0],
+                    afipserver_obj.search(
+                        cr, uid,
+                        [('code', '=', 'wsfe'),
+                         ('category', '=', conn_category)])[0],
                     'certificate': ws.wsfe_certificate_id.id,
                     'batch_sequence_id': seq_id,
                 })

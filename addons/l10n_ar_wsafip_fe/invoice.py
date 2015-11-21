@@ -71,7 +71,7 @@ class account_invoice(models.Model):
         ])
         return [{'Tipo': rel_inv.journal_id.journal_class_id.afip_code,
                  'PtoVta': rel_inv.journal_id.point_of_sale,
-                 'Nro': self.invoice_number} for rel_inv in rel_invs]
+                 'Nro': self.number} for rel_inv in rel_invs]
 
     @api.model
     def get_taxes(self):

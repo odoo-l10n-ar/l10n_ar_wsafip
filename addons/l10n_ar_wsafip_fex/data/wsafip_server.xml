@@ -22,28 +22,28 @@
         <record model='wsafip.server' id='wsfe_prod'>
             <field name='name'>Factura Electrónica</field>
             <field name='code'>wsfe</field>
-            <field name='class'>production</field>
+            <field name='category'>production</field>
             <field name='url'>https://servicios1.afip.gov.ar/wsfexv1/service.asmx</field>
         </record>
 
         <record model='wsafip.server' id='wsfe_homo'>
             <field name='name'>Factura Electrónica (Homologación)</field>
             <field name='code'>wsfe</field>
-            <field name='class'>homologation</field>
+            <field name='category'>homologation</field>
             <field name='url'> https://wswhomo.afip.gov.ar/wsfexv1/service.asmx</field>
         </record>
 
         <record model='wsafip.server' id='wsfex_prod'>
             <field name='name'>Factura Electrónica de Exportación</field>
             <field name='code'>wsfex</field>
-            <field name='class'>production</field>
+            <field name='category'>production</field>
             <field name='url'>https://servicios1.afip.gov.ar/wsfexv1/service.asmx</field>
         </record>
 
         <record model='wsafip.server' id='wsfex_homo'>
             <field name='name'>Factura Electrónica de Exportación (Homologación)</field>
             <field name='code'>wsfex</field>
-            <field name='class'>homologation</field>
+            <field name='category'>homologation</field>
             <field name='url'> https://wswhomo.afip.gov.ar/wsfexv1/service.asmx</field>
         </record>
 

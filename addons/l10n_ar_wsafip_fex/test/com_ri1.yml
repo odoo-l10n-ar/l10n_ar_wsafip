@@ -67,14 +67,15 @@
         raise AssertionError, 'Error in period creation for Resp. Insc.. Expected %i, exists %i.' % (expected_periods, len(period_ids))
 
 - Setup Wizard to connect to journals to webservice.
-- !record {model: l10n_ar_wsafip_fe.config, id: inv_wiz_ivari_fe }:
+- !record {model: l10n_ar_wsafip_fex.config, id: inv_wiz_ivari_fe }:
         company_id: com_ivari
-        wsfe_certificate_id: cert_ar_0
-        wsfe_for_homologation: True
-        wsfe_point_of_sale: '1'
+        wsfex_certificate_id: cert_ar_0
+        wsfex_for_homologation: True
+        wsfex_point_of_sale: '1'
+
 
 - Execute Wizard to connect to journals to webservice.
-- !python {model: l10n_ar_wsafip_fe.config }: |
+- !python {model: l10n_ar_wsafip_fex.config }: |
     self.execute(cr, uid, [ref("inv_wiz_ivari_fe")], {})
 
 #

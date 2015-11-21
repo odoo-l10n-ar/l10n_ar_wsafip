@@ -22,14 +22,14 @@
         <record model='wsafip.server' id='wsfe_prod'>
             <field name='name'>Factura Electrónica</field>
             <field name='code'>wsfe</field>
-            <field name='class'>production</field>
+            <field name='category'>production</field>
             <field name='url'>https://servicios1.afip.gov.ar/wsfev1/service.asmx</field>
         </record>
 
         <record model='wsafip.server' id='wsfe_homo'>
             <field name='name'>Factura Electrónica (Homologación)</field>
             <field name='code'>wsfe</field>
-            <field name='class'>homologation</field>
+            <field name='category'>homologation</field>
             <field name='url'> https://wswhomo.afip.gov.ar/wsfev1/service.asmx</field>
         </record>
 

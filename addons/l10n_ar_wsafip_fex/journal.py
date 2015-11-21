@@ -22,7 +22,7 @@ class account_journal(osv.osv):
             if not conn:
                 r[journal.id] = 'not_available'
                 continue
-            elif conn.server_id.code != 'wsfe':
+            elif conn.server_id.code != 'wsfex':
                 r[journal.id] = 'connection_service_error'
                 continue
 

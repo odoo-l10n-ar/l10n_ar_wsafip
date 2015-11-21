@@ -19,12 +19,12 @@
 <openerp>
 	<data noupdate="0">
         <report 
-            id="l10n_ar_wsafip_fe_invoices"
+            id="l10n_ar_wsafip_fex_invoices"
             model="account.invoice"
             string="Invoices"
             report_type="qweb-pdf"
-            name="l10n_ar_wsafip_fe.report_invoice"
-            file="l10n_ar_wsafip_fe.report_invoice"
+            name="l10n_ar_wsafip_fex.report_invoice"
+            file="l10n_ar_wsafip_fex.report_invoice"
             attachment_use="True"
             attachment="(object.state in ('open','paid')) and ('INV'+(object.number or '').replace('/','')+'.pdf')"
         />

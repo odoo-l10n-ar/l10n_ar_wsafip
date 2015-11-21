@@ -21,40 +21,40 @@
 
     <!-- Generate request -->
 
-        <record id="view_wsafip_fe_config" model="ir.ui.view">
-            <field name="name">l10n_ar_wsafip_fe.config.form</field>
-            <field name="model">l10n_ar_wsafip_fe.config</field>
+        <record id="view_wsafip_fex_config" model="ir.ui.view">
+            <field name="name">l10n_ar_wsafip_fex.config.form</field>
+            <field name="model">l10n_ar_wsafip_fex.config</field>
             <field name="inherit_id" ref="base.res_config_view_base"/>
             <field name="arch" type="xml">
               <data>
                 <form position="attributes">
-                    <attribute name="string">AFIP Web service Configuration - Request Generation</attribute>
+                    <attribute name="string">Invoice Web service for Export Configuration</attribute>
                 </form>
                 <group string="res_config_contents" position="replace">
                     <group colspan="8">
-                        <field name="company_id" widget="selection" on_change="update_data(company_id)"/>
-                        <field name="wsfe_certificate_id" widget="selection"/>
-                        <field name="wsfe_for_homologation"/>
-                        <field name="wsfe_point_of_sale"/>
+                        <field name="company_id" widget="selection"/>
+                        <field name="wsfex_certificate_id" widget="selection"/>
+                        <field name="wsfex_for_homologation"/>
+                        <field name="wsfex_point_of_sale"/>
                     </group>
                 </group>
               </data>
             </field>
         </record>
 
-        <record id="action_wsafip_fe_config" model="ir.actions.act_window">
+        <record id="action_wsafip_fex_config" model="ir.actions.act_window">
             <field name="name">Electronic Invoice Configuration</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">l10n_ar_wsafip_fe.config</field>
-            <field name="view_id" ref="view_wsafip_fe_config"/>
+            <field name="res_model">l10n_ar_wsafip_fex.config</field>
+            <field name="view_id" ref="view_wsafip_fex_config"/>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
         </record>
 
-        <record id="wsafip_fe_config_todo" model="ir.actions.todo">
+        <record id="wsafip_fex_config_todo" model="ir.actions.todo">
             <field name="name">AFIP Electronic Invoice Web service Configuration - Setting POS</field>
-            <field name="action_id" ref="action_wsafip_fe_config"/>
+            <field name="action_id" ref="action_wsafip_fex_config"/>
             <field name="sequence">40</field>
             <field name="type">automatic</field>
         </record>

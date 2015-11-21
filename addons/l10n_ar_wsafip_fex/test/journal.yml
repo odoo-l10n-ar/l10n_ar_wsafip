@@ -8,12 +8,21 @@
 
 - In order to test afip webservices append an FE service instance
 - !record {model: wsafip.connection, id: connection_ar_0}:
-    name: Moldeo Interactive FE
+    name: Moldeo Interactive FEX
     partner_id: par_ivari
     logging_id: l10n_ar_wsafip.wsaa_homo
-    server_id: wsfe_homo
+    server_id: wsfex_homo
     certificate: cert_ar_0
     batch_sequence_id: fe_sequence_0
+
+#
+# Testeando conección
+#
+
+- Dummy test
+- !python {model: wsafip.connection}:
+    self.wsfex_dummy(cr, uid, ref("connection_ar_0"))
+
 
 #
 # Preparando Journal
