@@ -224,10 +224,10 @@ class account_invoice(models.Model):
             'PtoVta': journal.point_of_sale,
             'Concepto': inv.afip_concept,
             'DocTipo': inv.partner_id.document_type_id.afip_code or '99',
-            'DocNro': int(inv.partner_id.document_number
-                          if inv.partner_id.document_type_id.afip_code
-                          is not None
-                          else False),
+            'DocNro': int(inv.partner_id.document_number)
+                      if inv.partner_id.document_type_id.afip_code is not None
+                      and inv.partner_id.document_number.isdigit()
+                      else None,
             'CbteDesde': invoice_number,
             'CbteHasta': invoice_number,
             'CbteFch': _f_date(inv.date_invoice),
