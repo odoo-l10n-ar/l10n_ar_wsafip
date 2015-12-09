@@ -34,8 +34,26 @@ class account_invoice(models.Model):
     afip_error_id = fields.Many2one('wsafip.error',
                                     string='Web Service Status',
                                     readonly=True)
-    state = fields.Selection(selection_add=[('batch_validation',
-                                             'Batch Validation')])
+    state = fields.Selection(selection_add=[('delayed',
+                                             'Delay WS Validation')])
+
+    @api.multi
+    def action_delay(self):
+        self.write({'state': 'delayed'})
+        return True
+
+    @api.multi
+    def no_delays(self):
+        """
+        Return true if exists any other invoice in delay in the journal
+        """
+        self.ensure_one()
+
+        if self.search([('journal_id', '=', self.journal_id),
+                        ('state', '=', 'delayed')]):
+            return False
+        else:
+            return True
 
     @api.one
     def valid_batch(self):
@@ -225,9 +243,9 @@ class account_invoice(models.Model):
             'Concepto': inv.afip_concept,
             'DocTipo': inv.partner_id.document_type_id.afip_code or '99',
             'DocNro': int(inv.partner_id.document_number)
-                      if inv.partner_id.document_type_id.afip_code is not None
-                      and inv.partner_id.document_number.isdigit()
-                      else None,
+            if inv.partner_id.document_type_id.afip_code is not None
+            and inv.partner_id.document_number.isdigit()
+            else None,
             'CbteDesde': invoice_number,
             'CbteHasta': invoice_number,
             'CbteFch': _f_date(inv.date_invoice),

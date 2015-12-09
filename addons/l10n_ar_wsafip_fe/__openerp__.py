@@ -16,7 +16,6 @@
           'wizard/validate_invoices_view.xml',
           'security/wsafip_fe_security.xml',
           'security/ir.model.access.csv'],
- 'demo_xml': [],
  'depends': ['l10n_ar_wsafip', 'l10n_ar_invoice'],
  'description': '\n\nAPI e GUI para acceder a las'
  ' Web Services de Factura Electrónica de la AFIP\n\n',
@@ -30,7 +29,8 @@
           'test/journal.yml',
           'test/journal_online.yml',
           'test/invoice.yml',
-          'test/invoice_report.yml'],
+          'test/invoice_report.yml',
+          'test/delay.yml'],
  'version': '8.0.1.1',
  'website': 'https://launchpad.net/~openerp-l10n-ar-localization'}
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

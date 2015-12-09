@@ -2,10 +2,7 @@
 from openerp import models, api
 from openerp.exceptions import Warning
 import logging
-from openerp.addons.l10n_ar_wsafip.tools import service
-# from suds.client import Client
-# from suds import WebFault
-# from datetime import date
+from openerp.addons.l10n_ar_wsafip.tools import service, update_afip_code
 
 _logger = logging.getLogger(__name__)
 
@@ -258,6 +255,7 @@ class wsafip_server(models.Model):
     def wsfex_update(self, conn_id):
         self.wsfex_dummy(conn_id)
         self.wsfex_get_web_points_of_sale(conn_id)
+        # TODO:
         country_cuit = self.wsfex_get_country_cuit_codes(conn_id)
         import pdb; pdb.set_trace()
 
