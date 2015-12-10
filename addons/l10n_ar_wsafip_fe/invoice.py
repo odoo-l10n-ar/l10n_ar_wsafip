@@ -244,6 +244,7 @@ class account_invoice(models.Model):
             'DocTipo': inv.partner_id.document_type_id.afip_code or '99',
             'DocNro': int(inv.partner_id.document_number)
             if inv.partner_id.document_type_id.afip_code is not None
+            and inv.partner_id.document_number
             and inv.partner_id.document_number.isdigit()
             else None,
             'CbteDesde': invoice_number,
