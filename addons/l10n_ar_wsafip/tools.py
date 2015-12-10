@@ -15,6 +15,9 @@ def service(code):
             if self.code != code:
                 return False
 
+            if conn_id == 1:
+                import pdb; pdb.set_trace()
+
             conn = self.env['wsafip.connection'].browse(conn_id)
             conn.login()
 

@@ -1,22 +1,20 @@
 #
 # Check connection to AFIP
 #
-- Check status of connection.
+- Check status of connection for journal FVA
 - !python {model: account.journal}: |
     journal_id = self.search(cr, uid, [('code','=','FVA0001'), ('company_id.name','=','Coop. Trab. Moldeo Interactive Ltda.')])
     data = self.read(cr, uid, journal_id)
 
-- Check status of connection.
 - !assert {model: account.journal, search: "[('code','=','FVA0001'), ('company_id.name','=','Coop. Trab. Moldeo Interactive Ltda.')]", string: Connection must happen}:
    - afip_state == 'connected' 
    - afip_items_generated >= 0
 
-- Check status of connection.
+- Check status of connection for invoice FVB.
 - !python {model: account.journal}: |
     journal_id = self.search(cr, uid, [('code','=','FVB0001'), ('company_id.name','=','Coop. Trab. Moldeo Interactive Ltda.')])
     data = self.read(cr, uid, journal_id)
 
-- Check status of connection.
 - !assert {model: account.journal, search: "[('code','=','FVB0001'), ('company_id.name','=','Coop. Trab. Moldeo Interactive Ltda.')]", string: Connection must happen}:
    - afip_state == 'connected' 
    - afip_items_generated >= 0

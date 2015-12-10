@@ -28,6 +28,7 @@
           'test/com_ri1.yml',
           'test/journal.yml',
           'test/journal_online.yml',
+          'test/query_invoices.yml',
           'test/invoice.yml',
           'test/invoice_report.yml',
           'test/delay.yml'],

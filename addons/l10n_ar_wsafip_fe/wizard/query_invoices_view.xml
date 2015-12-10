@@ -9,7 +9,7 @@
         <field name="arch" type="xml">
           <form string="Create and Update Invoices with AFIP">
               <group string="Select Journal and range of invoices to query">
-                  <field name="journal_id" on_change="onchange_journal_id(first_invoice_number, journal_id)" domain="[('afip_connection_id','!=',False)]"/>
+                  <field name="journal_id" domain="[('afip_connection_id','!=',False)]"/>
                   <field name="default_product_id"/>
                   <field name="default_service_id"/>
                   <field name="first_invoice_number"/>

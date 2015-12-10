@@ -6,7 +6,6 @@ from openerp.addons.l10n_ar_wsafip.tools import service
 
 from openerp.osv import osv
 from openerp.tools.translate import _
-import logging
 from openerp.addons.l10n_ar_wsafip.sslhttps import HttpsTransport
 from datetime import date
 
@@ -17,7 +16,7 @@ logging.getLogger('suds.transport').setLevel(logging.DEBUG)
 fe_service = service('wsfe')
 
 
-class wsafip_server(osv.osv):
+class wsafip_server(models.Model):
     _inherit = "wsafip.server"
 
     """
@@ -281,8 +280,6 @@ class wsafip_server(osv.osv):
         AFIP Description: Recuperador de valores referenciales de códigos de
         Tipos de Tributos (FEParamGetTiposTributos)
         """
-        import pdb; pdb.set_trace()
-
         response = service.FEParamGetTiposTributos(Auth=auth)
 
         tax_list = [
@@ -293,24 +290,28 @@ class wsafip_server(osv.osv):
 
         response = service.FEParamGetTiposIva(Auth=auth)
 
+        def _escape_(s):
+            return s.replace('%', '%%')
+
         tax_list.extend([
             {'afip_code': c.Id,
              'name': "%s" % _escape_(c.Desc)}
-             for c in response.ResultGet.IvaTipo
+            for c in response.ResultGet.IvaTipo
         ])
 
-        tax_code_obj = self.pool.get('account.tax.code')
+        tax_code_pool = self.env['account.tax.code']
 
         for tc in tax_list:
-            tax_code_ids = tax_code_obj.search(
-                cr, uid, [('name', 'ilike', tc['name'])])
-            _logger.debug("Tax '%s' match with %s" %
-                            (tc['name'], tax_code_ids))
-            if tax_code_ids:
-                w = dict(tc)
-                del w['name']
-                tax_code_obj.write(cr, uid, tax_code_ids, w)
-
+            tax_codes = tax_code_pool.search([('name', 'ilike', tc['name'])])
+            if len(tax_codes) == 1:
+                _logger.debug("Tax '%s' match with %s" %
+                              (tc['name'], tax_codes.name))
+                tax_codes.afip_code = tc['afip_code']
+            elif len(tax_codes) > 1:
+                _logger.debug("Tax '%s' match with some %s" %
+                              (tc['name'], ','.join(tax_codes.mapped("name"))))
+            else:
+                _logger.debug("Tax '%s' match with nobody." % tc['name'])
         return True
 
     def wsfe_get_last_invoice_number(self, cr, uid, ids, conn_id, ptoVta,
@@ -470,87 +471,56 @@ class wsafip_server(osv.osv):
                     }
         return r
 
-    def wsfe_query_invoice(self, cr, uid, ids, conn_id, cbteTipo, cbteNro,
-                           ptoVta, context=None):
+    @api.multi
+    @fe_service
+    def wsfe_query_invoice(self, service, auth, cbteTipo, cbteNro, ptoVta):
         """
         Query for invoice stored by AFIP Web service.
 
         AFIP Description: Método para consultar Comprobantes Emitidos
         y su código (FECompConsultar)
         """
-        conn_obj = self.pool.get('wsafip.connection')
-        r = {}
+        response = service.FECompConsultar(
+            Auth=auth,
+            FeCompConsReq={
+                'CbteTipo': cbteTipo,
+                'CbteNro': cbteNro,
+                'PtoVta': ptoVta,
+            })
 
-        for srv in self.browse(cr, uid, ids, context=context):
-            # Ignore servers without code WSFE.
-            if srv.code != 'wsfe':
-                continue
-
-            # Take the connection
-            conn = conn_obj.browse(cr, uid, conn_id, context=context)
-            conn.login()
-
-            try:
-                _logger.info('Query for invoice stored by AFIP Web service')
-                srvclient = Client(srv.url+'?WSDL', transport=HttpsTransport())
-                response = srvclient.service.FECompConsultar(
-                    Auth=conn.get_auth(),
-                    FeCompConsReq={
-                        'CbteTipo': cbteTipo,
-                        'CbteNro': cbteNro,
-                        'PtoVta': ptoVta,
-                    })
-            except Exception as e:
-                _logger.error('AFIP Web service error!: (%i) %s' % (e[0], e[1]))
-                raise osv.except_osv(
-                    _(u'AFIP Web service error'),
-                    _(u'System return error %i: %s\n'
-                      u'Pueda que esté intente realizar esta operación'
-                      u'desde el servidor de homologación.'
-                      u'Intente desde el servidor de producción.') %
-                    (e[0], e[1]))
-
-            if hasattr(response, 'Errors'):
-                for e in response.Errors.Err:
-                    _logger.error('AFIP Web service error!: (%i) %s' %
-                                  (e.Code, e.Msg))
-                r[srv.id] = False
-            else:
-                r[srv.id] = {
-                    'Concepto': response.ResultGet.Concepto,
-                    'DocTipo': response.ResultGet.DocTipo,
-                    'DocNro': response.ResultGet.DocNro,
-                    'CbteDesde': response.ResultGet.CbteDesde,
-                    'CbteHasta': response.ResultGet.CbteHasta,
-                    'CbteFch': response.ResultGet.CbteFch,
-                    'ImpTotal': response.ResultGet.ImpTotal,
-                    'ImpTotConc': response.ResultGet.ImpTotConc,
-                    'ImpNeto': response.ResultGet.ImpNeto,
-                    'ImpOpEx': response.ResultGet.ImpOpEx,
-                    'ImpTrib': response.ResultGet.ImpTrib,
-                    'ImpIVA': response.ResultGet.ImpIVA,
-                    'FchServDesde': response.ResultGet.FchServDesde,
-                    'FchServHasta': response.ResultGet.FchServHasta,
-                    'FchVtoPago': response.ResultGet.FchVtoPago,
-                    'MonId': response.ResultGet.MonId,
-                    'MonCotiz': response.ResultGet.MonCotiz,
-                    'Resultado': response.ResultGet.Resultado,
-                    'CodAutorizacion': response.ResultGet.CodAutorizacion,
-                    'EmisionTipo': response.ResultGet.EmisionTipo,
-                    'FchVto': response.ResultGet.FchVto,
-                    'FchProceso': response.ResultGet.FchProceso,
-                    'PtoVta': response.ResultGet.PtoVta,
-                    'CbteTipo': response.ResultGet.CbteTipo,
-                    'Iva': [
-                        {'Id': item.Id,
-                         'BaseImp': item.BaseImp,
-                         'Importe': item.Importe}
-                        for tag, iva in response.ResultGet.Iva
-                        for item in iva
-                    ],
-                }
-
-        return r
+        return {
+            'Concepto': response.ResultGet.Concepto,
+            'DocTipo': response.ResultGet.DocTipo,
+            'DocNro': response.ResultGet.DocNro,
+            'CbteDesde': response.ResultGet.CbteDesde,
+            'CbteHasta': response.ResultGet.CbteHasta,
+            'CbteFch': response.ResultGet.CbteFch,
+            'ImpTotal': response.ResultGet.ImpTotal,
+            'ImpTotConc': response.ResultGet.ImpTotConc,
+            'ImpNeto': response.ResultGet.ImpNeto,
+            'ImpOpEx': response.ResultGet.ImpOpEx,
+            'ImpTrib': response.ResultGet.ImpTrib,
+            'ImpIVA': response.ResultGet.ImpIVA,
+            'FchServDesde': response.ResultGet.FchServDesde,
+            'FchServHasta': response.ResultGet.FchServHasta,
+            'FchVtoPago': response.ResultGet.FchVtoPago,
+            'MonId': response.ResultGet.MonId,
+            'MonCotiz': response.ResultGet.MonCotiz,
+            'Resultado': response.ResultGet.Resultado,
+            'CodAutorizacion': response.ResultGet.CodAutorizacion,
+            'EmisionTipo': response.ResultGet.EmisionTipo,
+            'FchVto': response.ResultGet.FchVto,
+            'FchProceso': response.ResultGet.FchProceso,
+            'PtoVta': response.ResultGet.PtoVta,
+            'CbteTipo': response.ResultGet.CbteTipo,
+            'Iva': [
+                {'Id': item.Id,
+                 'BaseImp': item.BaseImp,
+                 'Importe': item.Importe}
+                for tag, iva in response.ResultGet.Iva
+                for item in iva
+            ]
+        }
 
     def wsfe_get_caea(self, cr, uid, ids, conn_id, date=date.today(),
                       context=None):
