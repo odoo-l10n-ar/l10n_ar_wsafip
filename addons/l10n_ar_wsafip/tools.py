@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from openerp import models
 from openerp.exceptions import Warning
 from suds import WebFault
 from suds.transport import TransportError
@@ -10,15 +11,13 @@ _logger = logging.getLogger(__name__)
 
 def service(code):
     def _deco_service_(func):
-        def _deco_client_(self, conn_id, *args, **kargs):
+        def _deco_client_(self, conn, *args, **kargs):
             self.ensure_one()
             if self.code != code:
                 return False
 
-            if conn_id == 1:
-                import pdb; pdb.set_trace()
-
-            conn = self.env['wsafip.connection'].browse(conn_id)
+            if not isinstance(conn, models.Model):
+                conn = self.env['wsafip.connection'].browse(conn)
             conn.login()
 
             try:

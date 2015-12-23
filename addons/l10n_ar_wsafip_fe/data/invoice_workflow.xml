@@ -21,7 +21,9 @@
         <record id="account.act_open" model="workflow.activity">
             <field name="wkf_id" ref="account.wkf"/>
             <field name="name">open</field>
-            <field name="action">afip_validation()
+            <field name="action">
+afip_validation()
+wsafip_validation()
 action_date_assign()
 action_move_create()
 action_number()
@@ -34,29 +36,24 @@ invoice_validate()</field>
             <field name="wkf_id" ref="account.wkf"/>
             <field name="name">delayed</field>
             <field name="action">
+afip_validation()
+wsafip_validation()
 action_date_assign()
 action_move_create()
-action_number()
-invoice_validate()</field>
+action_number()</field>
             <field name="kind">function</field>
         </record>
 
-        <record id="account.t4" model="workflow.transition">
-            <field name="act_from" ref="account.act_draft"/>
-            <field name="act_to" ref="account.act_open"/>
-            <field name="condition">no_delays() and valid_batch()</field>
-        </record>
-            
         <record id="account.t5" model="workflow.transition">
             <field name="act_from" ref="account.act_draft"/>
             <field name="act_to" ref="account.act_delayed"/>
-            <field name="condition">True</field>
+            <field name="signal">invoice_delay</field>
         </record>
             
         <record id="account.t6" model="workflow.transition">
             <field name="act_from" ref="account.act_delayed"/>
             <field name="act_to" ref="account.act_open"/>
-            <field name="condition">valid_batch()</field>
+            <field name="signal">invoice_open</field>
         </record>
 
     </data>

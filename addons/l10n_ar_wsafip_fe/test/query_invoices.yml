@@ -10,6 +10,7 @@
 - Query invoices
 - !python {model: l10n_ar_wsafip_fe.query_invoices}: |
     wzr = self.browse(cr, uid, ref('qi'))
+    wzr.journal_id.sequence_id.write({'number_next': 0})
     wzr.execute()
 
 - Query invoices for FVB0001
@@ -21,5 +22,6 @@
 - Query invoices
 - !python {model: l10n_ar_wsafip_fe.query_invoices}: |
     wzr = self.browse(cr, uid, ref('qi'))
+    wzr.journal_id.sequence_id.write({'number_next': 0})
     wzr.execute()
 

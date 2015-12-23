@@ -94,7 +94,6 @@ class wsafip_connection(osv.osv):
     }
 
     def login(self, cr, uid, ids, context=None):
-
         state = self._get_state(cr, uid, ids, None, None)
 
         for ws in self.browse(cr, uid, [_id for _id, _stat in state.items()

@@ -49,17 +49,21 @@ class account_invoice(models.Model):
         """
         self.ensure_one()
 
-        if self.search([('journal_id', '=', self.journal_id),
+        if self.search([('journal_id', '=', self.journal_id.id),
                         ('state', '=', 'delayed')]):
             return False
         else:
             return True
 
-    @api.one
-    def valid_batch(self):
+    @api.multi
+    def wsafip_validation(self):
         """
-        Increment batch number groupping by afip connection server.
+        Check if invoice could be created with this number.
         """
+        self.ensure_one()
+
+        _logger.info("Invoice state: %s" % self.state)
+
         inv = self
         jou = inv.journal_id
         conn = jou.afip_connection_id
@@ -72,12 +76,6 @@ class account_invoice(models.Model):
                       'sistema para resolver este problema.'
                       ) % (jou.afip_items_generated + 1,
                            jou.sequence_id.number_next))
-
-            prefix = conn.batch_sequence_id.prefix or ''
-            suffix = conn.batch_sequence_id.suffix or ''
-            sid_re = re.compile('%s(\d*)%s' % (prefix, suffix))
-            sid = conn.batch_sequence_id.next_by_id(conn.batch_sequence_id.id)
-            inv.afip_batch_number = int(sid_re.search(sid).group(1))
 
         return True
 

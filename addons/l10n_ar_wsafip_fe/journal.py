@@ -51,23 +51,18 @@ class account_journal(models.Model):
 
     @api.depends("afip_connection_id")
     def _get_afip_items_generated(self):
-
-        def glin(conn, ps, jc):
-            r = conn.server_id.wsfe_get_last_invoice_number(conn.id, ps, jc)
-            return r[conn.server_id.id]
-
         for journal in self:
-            r = False
             conn = journal.afip_connection_id
             if conn and conn.server_id.code == 'wsfe':
-                try:
-                    r = glin(conn, journal.point_of_sale,
-                             journal.journal_class_id.afip_code)
-                except:
-                    r = False
-            _logger.debug("AFIP number of invoices in %s is %s" %
-                          (journal.name, r))
-            journal.afip_items_generated = r
+                r = conn.server_id.wsfe_get_last_invoice_number(
+                    conn,
+                    journal.point_of_sale,
+                    journal.journal_class_id.afip_code)
+                _logger.debug("AFIP number of invoices in %s is %s" %
+                            (journal.name, r))
+                journal.afip_items_generated = r
+            else:
+                journal.afip_items_generated = False
 
     _inherit = "account.journal"
 

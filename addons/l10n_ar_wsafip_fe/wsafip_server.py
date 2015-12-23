@@ -314,56 +314,26 @@ class wsafip_server(models.Model):
                 _logger.debug("Tax '%s' match with nobody." % tc['name'])
         return True
 
-    def wsfe_get_last_invoice_number(self, cr, uid, ids, conn_id, ptoVta,
-                                     cbteTipo, context=None):
+    @api.multi
+    @fe_service
+    def wsfe_get_last_invoice_number(self, service, auth, ptoVta, cbteTipo):
         """
         Get last ID number from AFIP
 
         AFIP Description: Recuperador de ultimo valor de comprobante registrado
         (FECompUltimoAutorizado)
         """
-        conn_obj = self.pool.get('wsafip.connection')
+        response = service.FECompUltimoAutorizado(Auth=auth,
+                                                  PtoVta=ptoVta,
+                                                  CbteTipo=cbteTipo)
 
-        r = {}
-
-        for srv in self.browse(cr, uid, ids, context=context):
-            # Ignore servers without code WSFE.
-            if srv.code != 'wsfe':
-                continue
-
-            # Take the connection
-            conn = conn_obj.browse(cr, uid, conn_id, context=context)
-            conn.login()
-            if conn.state not in ['connected', 'clockshifted']:
-                r[srv.id] = False
-                continue
-
-            try:
-                _logger.info('Take last invoice number from AFIP Web service '
-                             '(pto vta: %s, cbte tipo: %s)' %
-                             (ptoVta, cbteTipo))
-                srvclient = Client(srv.url+'?WSDL', transport=HttpsTransport())
-                response = srvclient.service.FECompUltimoAutorizado(
-                    Auth=conn.get_auth(), PtoVta=ptoVta, CbteTipo=cbteTipo)
-
-            except Exception as e:
-                _logger.error('AFIP Web service error!: (%i) %s' % (e[0], e[1]))
-                raise osv.except_osv(_(u'AFIP Web service error'),
-                                     _(u'System return error %i: %s\n'
-                                       u'Pueda que esté intente realizar esta '
-                                       u'operación desde el servidor de '
-                                       u'homologación. Intente desde el '
-                                       u'servidor de producción.') %
-                                     (e[0], e[1]))
-
-            if hasattr(response, 'Errors'):
-                for e in response.Errors.Err:
-                    _logger.error('AFIP Web service error!: (%i) %s' %
-                                  (e.Code, e.Msg))
-                r[srv.id] = False
-            else:
-                r[srv.id] = int(response.CbteNro)
-        return r
+        if hasattr(response, 'Errors'):
+            for e in response.Errors.Err:
+                _logger.error('AFIP Web service error!: (%i) %s' %
+                                (e.Code, e.Msg))
+            return False
+        else:
+            return int(response.CbteNro)
 
     def wsfe_get_cae(self, cr, uid, ids, conn_id, invoice_request,
                      context=None):
@@ -487,6 +457,12 @@ class wsafip_server(models.Model):
                 'CbteNro': cbteNro,
                 'PtoVta': ptoVta,
             })
+
+        if hasattr(response, 'Errors'):
+            for e in response.Errors.Err:
+                _logger.error('AFIP Web service error!: (%i) %s' %
+                                (e.Code, e.Msg))
+            return False
 
         return {
             'Concepto': response.ResultGet.Concepto,
