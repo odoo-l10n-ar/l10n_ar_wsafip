@@ -52,8 +52,7 @@ class wsafip_server(models.Model):
 
     @api.multi
     @fe_service
-    def wsfe_update_afip_concept_type(self, service, auth,
-                                      context=None):
+    def wsfe_update_afip_concept_type(self, service, auth):
         """
         Update concepts class.
 
@@ -335,110 +334,88 @@ class wsafip_server(models.Model):
         else:
             return int(response.CbteNro)
 
-    def wsfe_get_cae(self, cr, uid, ids, conn_id, invoice_request,
-                     context=None):
+    @api.multi
+    @fe_service
+    def wsfe_get_cae(self, service, auth, invoice_request):
         """
         Get CAE.
 
         AFIP Description: Método de autorización de comprobantes electrónicos
         por CAE (FECAESolicitar)
         """
-        conn_obj = self.pool.get('wsafip.connection')
         r = {}
 
-        for srv in self.browse(cr, uid, ids, context=context):
-            # Ignore servers without code WSFE.
-            if srv.code != 'wsfe':
-                continue
+        conn_obj = self.pool.get('wsafip.connection')
 
-            # Take the connection
-            conn = conn_obj.browse(cr, uid, conn_id, context=context)
-            conn.login()
-            if conn.state not in ['connected', 'clockshifted']:
-                continue
+        first = 0
 
-            _logger.info('Get CAE from AFIP Web service')
-            _logger.debug('Request: %s' % invoice_request)
-
-            auth = conn.get_auth()
-            try:
-                srvclient = Client(srv.url+'?WSDL', transport=HttpsTransport())
-                first = 0
-                response = srvclient.service.FECAESolicitar(
-                    Auth=auth,
-                    FeCAEReq=[{
-                        'FeCabReq': {
-                            'CantReg': len(invoice_request),
-                            'PtoVta': invoice_request[first]['PtoVta'],
-                            'CbteTipo': invoice_request[first]['CbteTipo'],
-                        },
-                        'FeDetReq': [
-                            {'FECAEDetRequest': dict(
-                                [(k, v) for k, v in req.iteritems()
-                                 if k not in ['CantReg', 'PtoVta', 'CbteTipo']
-                                 ])}
-                            for req in invoice_request
-                        ],
-                    }]
-                )
-            except WebFault as e:
-                _logger.error('AFIP Web service error!: %s' % (e[0]))
-                raise Warning(_(u'AFIP Web service error\n'
-                                u'System return error: %s') % e[0])
-            except Exception as e:
-                _logger.error('AFIP Web service error!: (%i) %s' % (e[0], e[1]))
-                raise Warning(_(u'AFIP Web service error\n'
-                                u'System return error %i: %s') % (e[0], e[1]))
-
-            soapRequest = [{'FeCabReq': {
-                'CantReg': len(invoice_request),
-                'PtoVta': invoice_request[first]['PtoVta'],
-                'CbteTipo': invoice_request[first]['CbteTipo'], },
+        response = srvclient.service.FECAESolicitar(
+            Auth=auth,
+            FeCAEReq=[{
+                'FeCabReq': {
+                    'CantReg': len(invoice_request),
+                    'PtoVta': invoice_request[first]['PtoVta'],
+                    'CbteTipo': invoice_request[first]['CbteTipo'],
+                },
                 'FeDetReq': [
                     {'FECAEDetRequest': dict(
                         [(k, v) for k, v in req.iteritems()
-                         if k not in ['CantReg', 'PtoVta', 'CbteTipo']])}
-                    for req in invoice_request], }]
+                         if k not in ['CantReg', 'PtoVta', 'CbteTipo']
+                         ])}
+                    for req in invoice_request
+                ],
+            }]
+        )
 
-            common_error = [
-                (err.Code, unicode(err.Msg)) for err in response.Errors[0]
-            ] if hasattr(response, 'Errors') else []
-            if (common_error):
-                _logger.error('Request error: %s' % (common_error,))
+        soapRequest = [{'FeCabReq': {
+            'CantReg': len(invoice_request),
+            'PtoVta': invoice_request[first]['PtoVta'],
+            'CbteTipo': invoice_request[first]['CbteTipo'], },
+            'FeDetReq': [
+                {'FECAEDetRequest': dict(
+                    [(k, v) for k, v in req.iteritems()
+                     if k not in ['CantReg', 'PtoVta', 'CbteTipo']])}
+                for req in invoice_request], }]
 
-            if not hasattr(response, 'FeDetResp'):
-                raise osv.except_osv(_(u'AFIP error'),
-                                     _(u'Stupid error:\n%s') %
-                                     ('\n'.join(
-                                         ["%i:%s" % err for err in common_error]
-                                     )))
+        common_error = [
+            (err.Code, unicode(err.Msg)) for err in response.Errors[0]
+        ] if hasattr(response, 'Errors') else []
+        if (common_error):
+            _logger.error('Request error: %s' % (common_error,))
 
-            for resp in response.FeDetResp.FECAEDetResponse:
-                if resp.Resultado == 'R':
-                    # Existe Error!
-                    _logger.error('Invoice error: %s' % (resp,))
-                    r[int(resp.CbteDesde)] = {
-                        'CbteDesde': resp.CbteDesde,
-                        'CbteHasta': resp.CbteHasta,
-                        'Observaciones':
-                        [(o.Code, unicode(o.Msg))
-                         for o in resp.Observaciones.Obs]
-                        if hasattr(resp, 'Observaciones') else [],
-                        'Errores': common_error +
-                        [(err.Code, unicode(err.Msg))
-                         for err in response.Errors.Err]
-                        if hasattr(response, 'Errors') else [],
-                    }
-                else:
-                    # Todo bien!
-                    r[int(resp.CbteDesde)] = {
-                        'CbteDesde': resp.CbteDesde,
-                        'CbteHasta': resp.CbteHasta,
-                        'CAE': resp.CAE,
-                        'CAEFchVto': resp.CAEFchVto,
-                        'Request': soapRequest,
-                        'Response': response,
-                    }
+        if not hasattr(response, 'FeDetResp'):
+            raise osv.except_osv(_(u'AFIP error'),
+                                 _(u'Stupid error:\n%s') %
+                                 ('\n'.join(
+                                     ["%i:%s" % err for err in common_error]
+                                 )))
+
+        for resp in response.FeDetResp.FECAEDetResponse:
+            if resp.Resultado == 'R':
+                # Existe Error!
+                _logger.error('Invoice error: %s' % (resp,))
+                r[int(resp.CbteDesde)] = {
+                    'CbteDesde': resp.CbteDesde,
+                    'CbteHasta': resp.CbteHasta,
+                    'Observaciones':
+                    [(o.Code, unicode(o.Msg))
+                     for o in resp.Observaciones.Obs]
+                    if hasattr(resp, 'Observaciones') else [],
+                    'Errores': common_error +
+                    [(err.Code, unicode(err.Msg))
+                     for err in response.Errors.Err]
+                    if hasattr(response, 'Errors') else [],
+                }
+            else:
+                # Todo bien!
+                r[int(resp.CbteDesde)] = {
+                    'CbteDesde': resp.CbteDesde,
+                    'CbteHasta': resp.CbteHasta,
+                    'CAE': resp.CAE,
+                    'CAEFchVto': resp.CAEFchVto,
+                    'Request': soapRequest,
+                    'Response': response,
+                }
         return r
 
     @api.multi
