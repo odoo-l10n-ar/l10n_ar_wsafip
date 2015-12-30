@@ -115,6 +115,7 @@ class l10n_ar_wsafip_fe_config(osv.osv_memory):
             # en los impuestos locales
             conn = conn_obj.browse(cr, uid, conn_id)
             conn.server_id.wsfe_update_tax(conn_id)
+            conn.server_id.wsfe_update_currency(conn_id)
 
         return True
 

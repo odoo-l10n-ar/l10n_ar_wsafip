@@ -198,6 +198,7 @@ class account_invoice(models.Model):
                 _('Must defined afip_code for the currency.'))
 
         req = self._new_request(journal, invoice_number)
+
         res = conn.server_id.wsfe_get_cae(conn.id, [req])
 
         for k, v in res.iteritems():

@@ -40,7 +40,7 @@ def service(code):
                 raise Warning(msg)
             except Exception as e:
                 msg = 'Unexpected error in WebService!: %s' % str(e)
-                _logger.error(msg)
+                _logger.error(msg, exc_info=1)
                 raise Warning(msg)
 
             return False
@@ -48,26 +48,33 @@ def service(code):
     return _deco_service_
 
 
-def update_afip_code(pool, cr, uid, model_name, remote_list, can_create=True,
-                     domain=[]):
-    model_obj = pool.get(model_name)
+def check_afip_errors(response, no_raise=False):
+    if hasattr(response, 'Errors'):
+        errors = '\n'.join("%s (%i)" % (e.Msg, unicode(e.Code))
+                           for e in response.Errors[0])
+        if not no_raise:
+            raise Warning("Errors:\n%s", errors)
+        else:
+            return errors
+    return False
 
+def update_afip_code(model_obj, remote_list, can_create=True, domain=[]):
     # Build set of AFIP codes
     rem_afip_code_set = set([i['afip_code'] for i in remote_list])
 
     # Take exists instances
-    sto_ids = model_obj.search(cr, uid, [('active', 'in', ['f', 't'])] + domain)
-    sto_list = model_obj.read(cr, uid, sto_ids, ['afip_code'])
-    sto_afip_code_set = set([i['afip_code'] for i in sto_list])
+    sto_afip_code_set = set(model_obj.search(
+        [('active', 'in', ['f', 't'])] + domain
+    ).mapped('afip_code'))
 
     # Append new afip_code
     to_append = rem_afip_code_set - sto_afip_code_set
     if to_append and can_create:
         for item in [i for i in remote_list if i['afip_code'] in to_append]:
-            model_obj.create(cr, uid, item)
+            model_obj.create(item)
     elif to_append and not can_create:
         _logger.warning('New items of type %s in WS. I will not create them.'
-                        % model_name)
+                        % model_obj._name)
 
     # Update active document types
     to_update = rem_afip_code_set & sto_afip_code_set
@@ -75,25 +82,24 @@ def update_afip_code(pool, cr, uid, model_name, remote_list, can_create=True,
                         if i['afip_code'] in to_update])
     to_active = [k for k, v in update_dict.items() if v]
     if to_active:
-        model_ids = model_obj.search(cr, uid, [
-            ('afip_code', 'in', to_active), ('active', 'in', ['f', False])])
-        model_obj.write(cr, uid, model_ids, {'active': True})
+        model_obj.search([
+            ('afip_code', 'in', to_active), ('active', 'in', ['f', False])]
+        ).write({'active': True})
 
     to_deactive = [k for k, v in update_dict.items() if not v]
     if to_deactive:
-        model_ids = model_obj.search(cr, uid,
-                                     [('afip_code', 'in', to_deactive),
-                                      ('active', 'in', ['t', True])])
-        model_obj.write(cr, uid, model_ids, {'active': False})
+        model_obj.search([
+            ('afip_code', 'in', to_deactive),
+            ('active', 'in', ['t', True])]).write({'active': False})
 
     # To disable exists local afip_code but not in remote
     to_inactive = sto_afip_code_set - rem_afip_code_set
     if to_inactive:
-        model_ids = model_obj.search(cr, uid,
-                                     [('afip_code', 'in', list(to_inactive))])
-        model_obj.write(cr, uid, model_ids, {'active': False})
+        model_obj.search(
+            [('afip_code', 'in', list(to_inactive))]
+        ).write({'active': False})
 
-    _logger.info('Updated %s items' % model_name)
+    _logger.info('Updated %s items' % model_obj._name)
 
     return True
 
