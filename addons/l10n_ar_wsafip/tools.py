@@ -50,7 +50,7 @@ def service(code):
 
 def check_afip_errors(response, no_raise=False):
     if hasattr(response, 'Errors'):
-        errors = '\n'.join("%s (%i)" % (e.Msg, unicode(e.Code))
+        errors = '\n'.join(u"%s (%s)" % (e.Msg, unicode(e.Code))
                            for e in response.Errors[0])
         if not no_raise:
             raise Warning("Errors:\n%s", errors)
