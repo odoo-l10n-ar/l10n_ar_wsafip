@@ -206,7 +206,6 @@ class query_invoices(models.TransientModel):
                     ('type_tax_use', '=', 'sale')
                 ])
                 line_vals = invoice_line_pool.product_id_change(
-                    cr, uid, False,
                     qi.default_product_id.id
                     if r['Concepto'] == 1
                     else qi.default_service_id.id,
