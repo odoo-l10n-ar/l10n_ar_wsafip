@@ -132,10 +132,6 @@ class query_invoices(models.TransientModel):
         qi = self
         v_r = []
 
-        cr = self.env.cr
-        uid = self.env.uid
-        context = self.env.context
-
         invoice_domain = eval(
             _queries[qi.update_domain],
             {},
@@ -162,8 +158,7 @@ class query_invoices(models.TransientModel):
                 number_format % inv_number)
             invs.message_post(
                 body=msg,
-                subtype="l10n_ar_wsafip_fe.mt_invoice_ws_action",
-                context=context)
+                subtype="l10n_ar_wsafip_fe.mt_invoice_ws_action")
             v_r.extend(invs.ids)
         elif invs and qi.update_invoices and len(invs) > 1:
             # Duplicated Invoices
@@ -174,8 +169,7 @@ class query_invoices(models.TransientModel):
             for inv in invs:
                 inv.message_post(
                     body=msg,
-                    subtype=_mt_invoice_ws_action,
-                    context=context)
+                    subtype=_mt_invoice_ws_action)
         elif not invs and qi.create_invoices:
             partner = qi._take_partner(r['DocTipo'], r['DocNro'])
 
@@ -225,8 +219,7 @@ class query_invoices(models.TransientModel):
                 number_format % inv_number)
             inv.message_post(
                 body=msg,
-                subtype=_mt_invoice_ws_action,
-                context=context)
+                subtype=_mt_invoice_ws_action)
             v_r.append(inv.id)
         else:
             _logger.debug("Ignoring invoice: %s" % (number_format % inv_number))
