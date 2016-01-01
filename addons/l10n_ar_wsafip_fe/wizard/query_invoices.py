@@ -219,7 +219,7 @@ class query_invoices(models.TransientModel):
                 line_vals['value']['invoice_id'] = inv.id
                 line_vals['value']['tax_id'] = (6, 0, taxs.ids)
                 line_vals['value']['price_unit'] = iva['BaseImp']
-                invoice_line_pool.create(cr, uid, line_vals['value'])
+                invoice_line_pool.create(line_vals['value'])
 
             msg = 'Created from AFIP (%s)' % (
                 number_format % inv_number)
