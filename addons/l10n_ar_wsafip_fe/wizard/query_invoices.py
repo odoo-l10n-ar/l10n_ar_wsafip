@@ -132,24 +132,20 @@ class query_invoices(models.TransientModel):
         qi = self
         v_r = []
 
-        cr = self.env.cr
-        uid = self.env.uid
-        context = self.env.context
-
         invoice_domain = eval(
             _queries[qi.update_domain],
             {},
             dict(r.items() + [
                 ['invoice_number', number_format % inv_number]]))
-        inv_ids = invoice_pool.search(
+        invs = invoice_pool.search(
             [('journal_id', '=', qi.journal_id.id)]
             + invoice_domain)
 
-        if inv_ids and qi.update_invoices and len(inv_ids) == 1:
+        if invs and qi.update_invoices and len(invs) == 1:
             # Update Invoice
             _logger.debug("Update invoice number: %s" % (
                 number_format % inv_number))
-            invoice_pool.write(cr, uid, inv_ids, {
+            invs.write({
                 'date_invoice': _fch_(r['CbteFch']),
                 'internal_number': number_format % inv_number,
                 'afip_cae': r['CodAutorizacion'],
@@ -160,31 +156,27 @@ class query_invoices(models.TransientModel):
             })
             msg = 'Updated from AFIP (%s)' % (
                 number_format % inv_number)
-            invoice_pool.message_post(
-                cr, uid, inv_ids,
+            invs.message_post(
                 body=msg,
-                subtype="l10n_ar_wsafip_fe.mt_invoice_ws_action",
-                context=context)
-            v_r.extend(inv_ids)
-        elif inv_ids and qi.update_invoices and len(inv_ids) > 1:
+                subtype="l10n_ar_wsafip_fe.mt_invoice_ws_action")
+            v_r.extend(invs.ids)
+        elif invs and qi.update_invoices and len(invs) > 1:
             # Duplicated Invoices
             _logger.info("Duplicated invoice number: %s %s" %
-                         (number_format % inv_number, tuple(inv_ids)))
+                         (number_format % inv_number, tuple(invs.ids)))
             msg = 'Posible duplication from AFIP (%s)' % (
                 number_format % inv_number)
-            for inv_id in inv_ids:
-                invoice_pool.message_post(
-                    cr, uid, inv_id,
+            for inv in invs:
+                inv.message_post(
                     body=msg,
-                    subtype=_mt_invoice_ws_action,
-                    context=context)
-        elif not inv_ids and qi.create_invoices:
+                    subtype=_mt_invoice_ws_action)
+        elif not invs and qi.create_invoices:
             partner = qi._take_partner(r['DocTipo'], r['DocNro'])
 
             _logger.debug("Creating invoice number: %s" %
                           (number_format % inv_number))
 
-            inv_id = invoice_pool.create(cr, uid, {
+            inv = invoice_pool.create({
                 'company_id': qi.journal_id.company_id.id,
                 'account_id':
                 partner.property_account_receivable.id,
@@ -203,12 +195,11 @@ class query_invoices(models.TransientModel):
                 'state': 'draft',
             })
             for iva in r['Iva']:
-                tax_id = tax_pool.search(cr, uid, [
+                taxs = tax_pool.search([
                     ('tax_code_id.afip_code', '=', iva['Id']),
                     ('type_tax_use', '=', 'sale')
                 ])
                 line_vals = invoice_line_pool.product_id_change(
-                    cr, uid, False,
                     qi.default_product_id.id
                     if r['Concepto'] == 1
                     else qi.default_service_id.id,
@@ -219,19 +210,17 @@ class query_invoices(models.TransientModel):
                     price_unit=iva['BaseImp'],
                     partner_id=partner.id,
                 )
-                line_vals['value']['invoice_id'] = inv_id
-                line_vals['value']['tax_id'] = (6, 0, tax_id)
+                line_vals['value']['invoice_id'] = inv.id
+                line_vals['value']['tax_id'] = (6, 0, taxs.ids)
                 line_vals['value']['price_unit'] = iva['BaseImp']
-                invoice_line_pool.create(cr, uid, line_vals['value'])
+                invoice_line_pool.create(line_vals['value'])
 
             msg = 'Created from AFIP (%s)' % (
                 number_format % inv_number)
-            invoice_pool.message_post(
-                cr, uid, inv_id,
+            inv.message_post(
                 body=msg,
-                subtype=_mt_invoice_ws_action,
-                context=context)
-            v_r.append(inv_id)
+                subtype=_mt_invoice_ws_action)
+            v_r.append(inv.id)
         else:
             _logger.debug("Ignoring invoice: %s" % (number_format % inv_number))
         return v_r
