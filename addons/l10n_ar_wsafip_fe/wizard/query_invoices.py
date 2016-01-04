@@ -256,7 +256,7 @@ class query_invoices(models.TransientModel):
 
             if qi.update_sequence:
                 qi.journal_id.sequence_id.number_next = \
-                    max(qi.journal_id.afip_items_generated,
+                    max(qi.journal_id.afip_items_generated+1,
                         qi.journal_id.sequence_id.number_next)
                 _logger.debug("Update invoice journal number to: %i" %
                               (qi.journal_id.sequence_id.number_next))
