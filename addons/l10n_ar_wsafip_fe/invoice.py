@@ -293,4 +293,35 @@ class account_invoice(models.Model):
             if is_electronic else 'account.report_invoice'
         )
 
+    @api.model
+    def cron_wsafip_fe(self):
+        _logger.info("Starting invoice validation")
+        cr = self.env.cr
+
+        for inv in self.search(
+            [
+                ('journal_id.afip_connection_id.server_id.code','=','wsfe'),
+                ('state','=','delayed'),
+            ]
+        ):
+            try:
+                inv.signal_workflow("invoice_open")
+            except Exception as e:
+                cr.rollback()
+                _logger.info("ERROR(%s): %s" % (con.name, str(e)))
+                con.message_post("Error validating invoice.\n"
+                                 "ERROR: %s" % str(e))
+                cr.commit()
+            except:
+                cr.rollback()
+                e = sys.exc_info()[0]
+                _logger.info("ERROR.sys(%s): %s" % (con.name, str(e)))
+                con.message_post("Error validating invoice.\n"
+                                 "ERROR: %s" % str(e))
+                cr.commit()
+            else:
+                cr.commit()
+
+        _logger.info("Finish invoice validation")
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
