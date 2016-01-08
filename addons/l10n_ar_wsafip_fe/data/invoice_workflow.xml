@@ -53,6 +53,12 @@ action_delay()</field>
             <field name="signal">invoice_open</field>
         </record>
 
+        <record id="account.t7" model="workflow.transition">
+            <field name="act_from" ref="account.act_delayed"/>
+            <field name="act_to" ref="account.act_cancel"/>
+            <field name="signal">invoice_cancel</field>
+        </record>
+
     </data>
 </openerp>
 <!-- vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4

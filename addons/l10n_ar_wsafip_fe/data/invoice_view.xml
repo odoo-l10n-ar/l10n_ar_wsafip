@@ -23,6 +23,7 @@
             <field name="name">account.invoice.afip.form</field>
             <field name="inherit_id" ref="account.invoice_form" />
             <field name="arch" type="xml">
+                <data>
                 <notebook position="inside">
                     <page string="AFIP Web Service" attrs="{'invisible':[('afip_batch_number','=',None)]}">
                         <group>
@@ -33,6 +34,10 @@
                         </group>
                     </page>
                 </notebook>
+                <button name="invoice_cancel" position="after">
+                    <button name="invoice_cancel" states="delayed" string="Cancel Invoice" groups="account.group_account_invoice"/>
+                </button>
+                </data>
             </field>
         </record>
     </data>
