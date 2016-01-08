@@ -44,7 +44,7 @@ class account_journal(models.Model):
                 conn.server_id.wsfe_get_status(conn.id)
 
             if authserver == 'OK':
-                syncronized = (journal.afip_items_generated ==
+                syncronized = (journal.afip_items_generated + 1 ==
                                journal.sequence_id.number_next)
 
             journal.afip_state = (
