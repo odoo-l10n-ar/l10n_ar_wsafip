@@ -3,6 +3,7 @@ from openerp import models, fields, api, _
 from openerp.exceptions import ValidationError
 import datetime as dt
 import re
+import sys
 import logging
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT as DATE_FORMAT
 
@@ -298,25 +299,40 @@ class account_invoice(models.Model):
         _logger.info("Starting invoice validation")
         cr = self.env.cr
 
+        # Solve unsynchronized journals
+        for jou in self.mapped('journal_id').filtered(lambda x:
+                                                      x.afip_state == 'unsync'):
+            query = self.env['l10n_ar_wsafip_fe.query_invoices'].create({
+                'journal_id': jou.id,
+                'first_invoice_number': jou.sequence_id.number_next,
+                'last_invoice_number': jou.afip_items_generated,
+                'update_invoices': True,
+                'update_sequence': True,
+                'update_domain': 'by number',
+                'create_invoices': False
+            })
+            query.execute()
+
+        # Validating invoices
         for inv in self.search(
             [
-                ('journal_id.afip_connection_id.server_id.code','=','wsfe'),
-                ('state','=','delayed'),
+                ('journal_id.afip_connection_id.server_id.code', '=', 'wsfe'),
+                ('state', '=', 'delayed'),
             ]
         ):
             try:
                 inv.signal_workflow("invoice_open")
             except Exception as e:
                 cr.rollback()
-                _logger.info("ERROR(%s): %s" % (con.name, str(e)))
-                con.message_post("Error validating invoice.\n"
+                _logger.info("ERROR(%s): %s" % (inv.name, str(e)))
+                inv.message_post("Error validating invoice.\n"
                                  "ERROR: %s" % str(e))
                 cr.commit()
             except:
                 cr.rollback()
                 e = sys.exc_info()[0]
-                _logger.info("ERROR.sys(%s): %s" % (con.name, str(e)))
-                con.message_post("Error validating invoice.\n"
+                _logger.info("ERROR.sys(%s): %s" % (inv.name, str(e)))
+                inv.message_post("Error validating invoice.\n"
                                  "ERROR: %s" % str(e))
                 cr.commit()
             else:

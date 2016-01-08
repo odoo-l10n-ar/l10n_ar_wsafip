@@ -43,8 +43,13 @@ class account_journal(models.Model):
                 = \
                 conn.server_id.wsfe_get_status(conn.id)
 
+            if authserver == 'OK':
+                syncronized = (journal.afip_items_generated ==
+                               journal.sequence_id.number_next)
+
             journal.afip_state = (
-                'connected' if authserver == 'OK' else
+                'connected' if authserver == 'OK' and syncronized else
+                'unsync' if authserver == 'OK' and not syncronized else
                 'connected_but_appserver_error' if appserver != 'OK' else
                 'connected_but_dbserver_error' if dbserver != 'OK' else
                 'connected_but_servers_error')
@@ -59,7 +64,7 @@ class account_journal(models.Model):
                     journal.point_of_sale,
                     journal.journal_class_id.afip_code)
                 _logger.debug("AFIP number of invoices in %s is %s" %
-                            (journal.name, r))
+                              (journal.name, r))
                 journal.afip_items_generated = r
             else:
                 journal.afip_items_generated = False
@@ -75,6 +80,7 @@ class account_journal(models.Model):
         selection=[
             ('not_available', 'Not available'),
             ('connected', 'Connected'),
+            ('unsync', 'Unsyncronized'),
             ('connection_error', 'Connection Error'),
             ('connected_but_appserver_error',
                 'Application service has troubles'),
