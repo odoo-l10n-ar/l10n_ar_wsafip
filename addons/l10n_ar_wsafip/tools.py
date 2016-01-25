@@ -8,8 +8,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-
-def service(code):
+def service(code, without_auth=False):
     def _deco_service_(func):
         def _deco_client_(self, conn, *args, **kargs):
             self.ensure_one()
@@ -21,11 +20,17 @@ def service(code):
             conn.login()
 
             try:
-                return func(self,
-                            self.client().service,
-                            conn.get_auth(),
-                            *args,
-                            **kargs)
+                if (without_auth):
+                    return func(self,
+                                self.client().service,
+                                *args,
+                                **kargs)
+                else:
+                    return func(self,
+                                self.client().service,
+                                conn.get_auth(),
+                                *args,
+                                **kargs)
             except TransportError as e:
                 msg = 'Connection error!: %s' % (e[0])
                 _logger.error(msg)
@@ -48,8 +53,9 @@ def service(code):
     return _deco_service_
 
 
-def check_afip_errors(response, no_raise=False):
+def check_afip_errors(response, no_raise=[]):
     if hasattr(response, 'Errors'):
+        no_raise = all(e.Code in no_raise for e in response.Errors[0])
         errors = '\n'.join(u"%s (%s)" % (e.Msg, unicode(e.Code))
                            for e in response.Errors[0])
         if not no_raise:
@@ -57,6 +63,7 @@ def check_afip_errors(response, no_raise=False):
         else:
             return errors
     return False
+
 
 def update_afip_code(model_obj, remote_list, can_create=True, domain=[]):
     # Build set of AFIP codes

@@ -3,8 +3,8 @@
 #
 - Create a simple invoice type B
 - !record {model: account.invoice, id: inv_ri2ri_delay}:
-    company_id: com_ivari
-    partner_id: par_rm
+    company_id: l10n_ar_invoice.com_ivari
+    partner_id: l10n_ar_invoice.par_rm
     journal_id: !ref {model: account.journal, search: "[('code','=','FVB0001'), ('company_id.name','=','Coop. Trab. Moldeo Interactive Ltda.')]"}
     period_id:  !ref {model: account.period, search: "[('company_id.name','=','Coop. Trab. Moldeo Interactive Ltda.')]"}
     account_id: !ref {model: account.account, search: "[('code','=','113010'), ('company_id.name','=','Coop. Trab. Moldeo Interactive Ltda.')]"}
@@ -13,7 +13,7 @@
         name: '[PC3] Medium PC'
         price_unit: 900.0
         quantity: 10.0
-        product_id: prod_iva21
+        product_id: l10n_ar_invoice.prod_iva21
         uos_id: product.product_uom_unit
         invoice_line_tax_id: !ref {model: account.tax, search: "[('name','=','01003005:V'),('company_id.name','=','Coop. Trab. Moldeo Interactive Ltda.')]"}
 
@@ -28,7 +28,7 @@
     - company_id.currency_id.name == 'ARS'
 
 - Validate invoice
-- !workflow {model: account.invoice, action: action_delay, ref: inv_ri2ri_delay}
+- !workflow {model: account.invoice, action: invoice_delay, ref: inv_ri2ri_delay}
 
 - Check CAE invoice number
 - !assert {model: account.invoice, id: inv_ri2ri_delay, string: CAE has been assigned}:

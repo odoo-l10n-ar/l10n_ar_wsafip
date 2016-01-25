@@ -14,6 +14,7 @@ _logger = logging.getLogger(__name__)
 logging.getLogger('suds.transport').setLevel(logging.DEBUG)
 
 fe_service = service('wsfe')
+fe_service_without_auth = service('wsfe', without_auth=True)
 
 
 class wsafip_server(models.Model):
@@ -39,8 +40,8 @@ class wsafip_server(models.Model):
     """
 
     @api.multi
-    @fe_service
-    def wsfe_get_status(self, service, auth):
+    @fe_service_without_auth
+    def wsfe_get_status(self, service):
         """
         AFIP Description: Método Dummy para verificación de funcionamiento
         de infraestructura (FEDummy)
@@ -353,7 +354,8 @@ class wsafip_server(models.Model):
                 'CbteNro': cbteNro,
                 'PtoVta': ptoVta,
             })
-        check_afip_errors(response)
+        if check_afip_errors(response, no_raise=[602]):
+            return {}
 
         return {
             'Concepto': response.ResultGet.Concepto,

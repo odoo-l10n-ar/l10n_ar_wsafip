@@ -1,0 +1,22 @@
+#
+# Preparando Tablas del afip
+#
+- Update AFIP Tables.
+- !python {model: wsafip.connection, id: l10n_ar_wsafip.connection_ar_0}: |
+        self.server_id.wsfe_update_afip_concept_type(self)
+        self.server_id.wsfe_update_journal_class(self)
+        self.server_id.wsfe_update_document_type(self)
+        self.server_id.wsfe_update_optional_types(self)
+        self.server_id.wsfe_update_currency(self)
+        self.server_id.wsfe_update_tax(self)
+
+#
+# Preparando Journal
+#
+- Update journal for Electronic Invoice. Invoice type A.
+- !python {model: account.journal}: |
+    journal_id = self.search(cr, uid, [('code','=','FVA0001'), ('company_id','=',ref('l10n_ar_invoice.com_ivari'))])
+    self.write(cr, uid, journal_id, {'afip_connection_id': ref("l10n_ar_wsafip.connection_ar_0")})
+    journal_id = self.search(cr, uid, [('code','=','FVB0001'), ('company_id','=',ref('l10n_ar_invoice.com_ivari'))])
+    self.write(cr, uid, journal_id, {'afip_connection_id': ref("l10n_ar_wsafip.connection_ar_0")})
+

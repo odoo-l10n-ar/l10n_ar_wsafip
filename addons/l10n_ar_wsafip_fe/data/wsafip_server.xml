@@ -30,7 +30,7 @@
             <field name='name'>Factura Electrónica (Homologación)</field>
             <field name='code'>wsfe</field>
             <field name='category'>homologation</field>
-            <field name='url'> https://wswhomo.afip.gov.ar/wsfev1/service.asmx</field>
+            <field name='url'>https://wswhomo.afip.gov.ar/wsfev1/service.asmx</field>
         </record>
 
     </data>

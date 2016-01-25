@@ -235,18 +235,18 @@ class wsafip_server(models.Model):
 
     @api.multi
     @fex_service
-    def wsfex_dummy(self, service, auth):
+    def wsfex_dummy(self, service):
         """
         2.16 MétodoDummy para verificación de funcionamiento de
         infraestructura (FEXDummy)
         """
         response = service.FEXDummy()
 
-        if response.AuthServer != 'OK':
+        if response.authserver != 'OK':
             raise Warning('Authentication is offline')
-        if response.AppServer != 'OK':
+        if response.appserver != 'OK':
             raise Warning('Webservice is offline')
-        if response.DbServer != 'OK':
+        if response.dbserver != 'OK':
             raise Warning('Database is offline')
 
         return True

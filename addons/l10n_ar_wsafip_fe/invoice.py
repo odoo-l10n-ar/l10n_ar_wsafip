@@ -29,12 +29,20 @@ def _get_parents(child, parents=[]):
 class account_invoice(models.Model):
     _inherit = "account.invoice"
 
-    afip_batch_number = fields.Integer('AFIP Batch number', readonly=True)
-    afip_cae = fields.Char('CAE number', size=24)
-    afip_cae_due = fields.Date('CAE due')
+    afip_batch_number = fields.Integer('AFIP Batch number',
+                                       readonly=True,
+                                       copy=False)
+    afip_cae = fields.Char('CAE number',
+                           size=24,
+                           readonly=True,
+                           copy=False)
+    afip_cae_due = fields.Date('CAE due',
+                               readonly=True,
+                               copy=False)
     afip_error_id = fields.Many2one('wsafip.error',
                                     string='Web Service Status',
-                                    readonly=True)
+                                    readonly=True,
+                                    copy=False)
     state = fields.Selection(selection_add=[('delayed',
                                              'Delay WS Validation')])
 
@@ -148,12 +156,15 @@ class account_invoice(models.Model):
         El listado de tipos de datos opcionales se puede consultar con el método
         FEParamGetTiposOpcional
         """
+        from openerp.tools import safe_eval
+
         opt_type_obj = self.env['afip.optional_type']
 
         return [{'Id': opt_type.afip_code,
                  'Valor': opt_type.value_computation(self)}
                 for opt_type in opt_type_obj.search([])
-                if opt_type.apply_rule(self)]
+                if opt_type.apply_rule and
+                safe_eval(opt_type.apply_rule, self.env.context)]
 
     @api.one
     def action_retrieve_cae(self):
