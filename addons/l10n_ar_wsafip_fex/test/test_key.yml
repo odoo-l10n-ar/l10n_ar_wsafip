@@ -1,3 +1,9 @@
+- Lenguaje español Argentina
+-
+  !python {model: res.partner}: |
+          from openerp.tools import *
+          load_language(cr, 'es_AR')
+
 -
  # Clave privada y Certificado asignado por AFIP.
  
