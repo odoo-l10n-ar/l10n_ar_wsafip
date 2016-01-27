@@ -25,3 +25,28 @@
     certificate: cert_ar_0
     batch_sequence_id: ws_sequence_0
 
+- Create user for webservices
+- !record {model: res.users, id: user_wsafip}:
+        name: WSAFIP user
+        login: user_wsafip
+        lang: es_AR
+        company_id: l10n_ar_invoice.com_ivari
+        company_ids:
+                - l10n_ar_invoice.com_ivari
+        groups_id:
+                - l10n_ar_invoice.group_l10n_ar_invoice_user
+                - group_wsafip_user
+
+- Create admin for webservices
+- !record {model: res.users, id: admin_wsafip}:
+        name: WSAFIP admin
+        login: admin_wsafip
+        lang: es_AR
+        company_id: l10n_ar_invoice.com_ivari
+        company_ids:
+                - l10n_ar_invoice.com_ivari
+        groups_id:
+                - l10n_ar_invoice.group_l10n_ar_invoice_admin
+                - group_wsafip_admin
+
+

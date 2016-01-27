@@ -27,7 +27,7 @@
             <field name='name'>Factura Electrónica de Exportación (Homologación)</field>
             <field name='code'>wsfex</field>
             <field name='category'>homologation</field>
-            <field name='url'> https://wswhomo.afip.gov.ar/wsfexv1/service.asmx</field>
+            <field name='url'>https://wswhomo.afip.gov.ar/wsfexv1/service.asmx</field>
         </record>
 
     </data>

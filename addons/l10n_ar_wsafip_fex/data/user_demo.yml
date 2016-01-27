@@ -1,12 +1,1 @@
-- Lenguaje español Argentina
--
-  !python {model: res.partner}: |
-          from openerp.tools import *
-          load_language(cr, 'es_AR')
-
-- Usuario de la localización
--
-  !record {model: res.users, id: argento_1}:
-          name: argento
-          lang: es_AR
 

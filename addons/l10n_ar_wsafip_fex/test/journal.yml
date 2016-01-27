@@ -2,35 +2,37 @@
 # Preparando Authorización
 #
 - Batch Sequence
-- !record {model: ir.sequence, id: fe_sequence_0}:
+- !record {model: ir.sequence, id: fex_sequence_0}:
     name: FE Web Service AFIP Sequence
     code: ws_afip_sequence
 
 - In order to test afip webservices append an FE service instance
-- !record {model: wsafip.connection, id: connection_ar_0}:
+- !record {model: wsafip.connection, id: fex_connection_ar_0}:
     name: Moldeo Interactive FEX
-    partner_id: par_ivari
+    partner_id: l10n_ar_invoice.par_ivari
     logging_id: l10n_ar_wsafip.wsaa_homo
     server_id: wsfex_homo
-    certificate: cert_ar_0
-    batch_sequence_id: fe_sequence_0
+    certificate: l10n_ar_wsafip.cert_ar_0
+    batch_sequence_id: fex_sequence_0
 
 #
-# Testeando conección
 #
-
-- Dummy test
-- !python {model: wsafip.connection}:
-    self.wsfex_dummy(cr, uid, ref("connection_ar_0"))
-
-
+# Configurando ambiente para generar facturas de exportación
 #
-# Preparando Journal
-#
-- Update journal for Electronic Invoice. Invoice type A.
-- !python {model: account.journal}: |
-    journal_id = self.search(cr, uid, [('code','=','FVA0001'), ('company_id.name','=','Coop. Trab. Moldeo Interactive Ltda.')])
-    self.write(cr, uid, journal_id, {'afip_connection_id': ref("connection_ar_0")})
-    journal_id = self.search(cr, uid, [('code','=','FVB0001'), ('company_id.name','=','Coop. Trab. Moldeo Interactive Ltda.')])
-    self.write(cr, uid, journal_id, {'afip_connection_id': ref("connection_ar_0")})
+- Lenguaje español Argentina
+-
+  !python {model: res.lang}: |
+          from openerp.tools import *
+          if not self.search(cr, uid, [('code','=','es_AR')]):
+                  load_language(cr, 'es_AR')
+
+- Set user
+- !context
+    uid: l10n_ar_wsafip.admin_wsafip
+
+- Update database values and create journal.
+- !python {model: wsafip.server}: |
+    self.browse(cr, uid, ref("wsfex_homo")).wsfex_dummy(ref("fex_connection_ar_0"))
+    self.browse(cr, uid, ref("wsfex_homo")).wsfex_update(ref("fex_connection_ar_0"))
+    self.browse(cr, uid, ref("wsfex_homo")).wsfex_update_journals(ref("fex_connection_ar_0"), test='1')
 
