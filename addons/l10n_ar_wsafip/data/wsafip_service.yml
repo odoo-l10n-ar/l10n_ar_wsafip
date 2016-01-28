@@ -33,6 +33,9 @@
         company_id: l10n_ar_invoice.com_ivari
         company_ids:
                 - l10n_ar_invoice.com_ivari
+
+- Set groups
+- !record {model: res.users, id: user_wsafip}:
         groups_id:
                 - l10n_ar_invoice.group_l10n_ar_invoice_user
                 - group_wsafip_user
@@ -45,8 +48,10 @@
         company_id: l10n_ar_invoice.com_ivari
         company_ids:
                 - l10n_ar_invoice.com_ivari
+
+- Set groups
+- !record {model: res.users, id: admin_wsafip}:
         groups_id:
                 - l10n_ar_invoice.group_l10n_ar_invoice_admin
                 - group_wsafip_admin
-
 

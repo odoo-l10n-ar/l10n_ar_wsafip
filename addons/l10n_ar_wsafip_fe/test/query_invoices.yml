@@ -15,7 +15,7 @@
 
 - Query invoices for FVB0001
 - !record {model: l10n_ar_wsafip_fe.query_invoices, id: qi}:
-    journal_id: !ref {model: account.journal, search: "[('code','=','FVB0001'), ('company_id.name','=','Coop. Trab. Moldeo Interactive Ltda.')]"}
+    journal_id: !ref {model: account.journal, search: "[('code','=','FVB0001'), ('company_id.name','=',ref('l10n_ar_invoice.com_ivari')]"}
     create_invoices: True
     update_sequence: True
 

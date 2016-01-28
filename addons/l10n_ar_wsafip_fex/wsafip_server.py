@@ -464,13 +464,17 @@ class wsafip_server(models.Model):
             if jou:
                 continue
 
+            journal_class_e = self.env['afip.journal_class'].search(
+                [('afip_code', '=', '019')])
+            company = self.env['res.users'].browse(self.env.uid).company_id
+
             new_sequence = self.env['l10n_ar_invoice.new_sequence']
             new_seq = new_sequence.create({
                     'name': 'Factura [Venta E] (%04i-FVE)' % int(po),
-                    'code': 'FVE%04i' % int(po),
+                    'code': 'ws_afip_sequence',
                     'prefix': '%04i' % int(po),
                     'suffix': '-FVE',
-                    'company_id': self.env.uid.company_id,
+                    'company_id': company.id,
                     'builder_id': False })
             new_seq.doit()
 
@@ -479,10 +483,10 @@ class wsafip_server(models.Model):
                     'name': 'Factura [Venta E] (%04i-FVE)' % int(po),
                     'code': 'FVE%04i' % int(po),
                     'type': 'sale',
-                    'journal_class_id': ref('l10n_ar_invoice.jc_FVE'),
+                    'journal_class_id': journal_class_e.id,
                     'point_of_sale': 1,
                     'sequence_name': 'Factura [Venta E] (%04i-FVE)' % int(po),
-                    'company_id': self.env.uid.company_id,
+                    'company_id': company.id,
                     'currency': False,
                     'builder_id': False })
             new_jou.doit()

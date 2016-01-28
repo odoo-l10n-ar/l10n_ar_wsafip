@@ -3,7 +3,7 @@
  'name': 'Argentina - Factura Electrónica de Exportación del AFIP',
  'author': 'OpenERP - Team de Localización Argentina',
  'category': 'Localization/Argentina',
- 'depends': ['l10n_ar_wsafip', 'l10n_ar_invoice', 'stock'],
+ 'depends': ['l10n_ar_wsafip_fe', 'stock'],
  'data': [
      'data/wsafip_server.xml',
      'data/invoice_view.xml',
@@ -24,7 +24,7 @@
           ],
  'license': 'AGPL-3',
  'test': [
-     # 'test/invoice.yml',
+     'test/invoice.yml',
      ],
  'version': '8.0.1.2',
  'website': 'https://launchpad.net/~openerp-l10n-ar-localization',

@@ -1,32 +1,29 @@
 #
-#       Create an invoice from Resp Inscr to Resp Inscr.
+#       Create an invoice from Resp Inscr to Extr.
 #
-- Context
-- !context
-    uid: l10n_ar_invoice.user_ivari
-
 - Create a simple invoice type E
 - !record {model: account.invoice, id: inv_ri2exp}:
     partner_id: par_exp
+    journal_id: !ref {search: "[('journal_class_id.code','=','FVE')]"}
     invoice_line:
       - quantity: 10.0
         product_id: l10n_ar_invoice.prod_iva21
         
 - Compute amount
 - !python {model: account.invoice}: |
-    inv_id = [ref('inv_ri2ri')]
+    inv_id = [ref('inv_ri2exp')]
     self.view_init(cr, uid, inv_id, {})
     self.button_compute(cr, uid, inv_id)
 
 - Check if company have the right currency
-- !assert {model: account.invoice, id: inv_ri2ri, string: Check if the company have the right currency}:
+- !assert {model: account.invoice, id: inv_ri2exp, string: Check if the company have the right currency}:
     - company_id.currency_id.name == 'ARS'
 
 - Validate invoice
-- !workflow {model: account.invoice, action: invoice_open, ref: inv_ri2ri}
+- !workflow {model: account.invoice, action: invoice_open, ref: inv_ri2exp}
 
 - Check CAE invoice number
-- !assert {model: account.invoice, id: inv_ri2ri, string: CAE has been assigned}:
+- !assert {model: account.invoice, id: inv_ri2exp, string: CAE has been assigned}:
     - afip_cae != ''
     - afip_cae_due != ''
 

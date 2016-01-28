@@ -34,5 +34,12 @@
 - !python {model: wsafip.server}: |
     self.browse(cr, uid, ref("wsfex_homo")).wsfex_dummy(ref("fex_connection_ar_0"))
     self.browse(cr, uid, ref("wsfex_homo")).wsfex_update(ref("fex_connection_ar_0"))
+
+- Update journalas as admin
+- !context
+    uid: 1
+
+- Update database values and create journal.
+- !python {model: wsafip.server}: |
     self.browse(cr, uid, ref("wsfex_homo")).wsfex_update_journals(ref("fex_connection_ar_0"), test='1')
 

@@ -6,14 +6,7 @@
             <field name="name">account.invoice.afip.form</field>
             <field name="inherit_id" ref="account.invoice_form" />
             <field name="arch" type="xml">
-                <notebook position="inside">
-                    <page string="FEX" attrs="{'invisible':[('journal_id.connection_id.server_id.type','!=','wsfex')]}">
-                        <group>
-                            <field name='afip_batch_number' invisible="1" readonly="1"/>
-                            <field name='afip_error_id' readonly="1"/>
-                        </group>
-                    </page>
-                </notebook>
+                <data></data>
             </field>
         </record>
     </data>
