@@ -453,6 +453,9 @@ class wsafip_server(models.Model):
             }
 
         jou_mod = self.env['account.journal']
+        company = self.env.context.get(
+            'company_id',
+            self.env['res.users'].browse(self.env.uid).company_id)
 
         for po in pos:
             jou = jou_mod.search([
@@ -461,12 +464,19 @@ class wsafip_server(models.Model):
                 ('journal_class_id.type', '=', 'sale'),
             ])
 
+            import pdb; pdb.set_trace()
             if jou:
                 continue
 
             journal_class_e = self.env['afip.journal_class'].search(
                 [('afip_code', '=', '019')])
-            company = self.env['res.users'].browse(self.env.uid).company_id
+
+            if not journal_class_e:
+                journal_class_e = self.env['afip.journal_class'].search(
+                    [('afip_code', '=', '019'), ('active', '=', False)])
+
+            if not journal_class_e:
+                raise Warning("Can't create journals!")
 
             new_sequence = self.env['l10n_ar_invoice.new_sequence']
             new_seq = new_sequence.create({
@@ -484,7 +494,7 @@ class wsafip_server(models.Model):
                     'code': 'FVE%04i' % int(po),
                     'type': 'sale',
                     'journal_class_id': journal_class_e.id,
-                    'point_of_sale': 1,
+                    'point_of_sale': int(po),
                     'sequence_name': 'Factura [Venta E] (%04i-FVE)' % int(po),
                     'company_id': company.id,
                     'currency': False,

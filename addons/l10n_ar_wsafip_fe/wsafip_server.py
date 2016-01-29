@@ -108,6 +108,7 @@ class wsafip_server(models.Model):
             self.env['afip.journal_class'],
             journalclass_list,
             can_create=False,
+            can_deactivate=False,
             domain=[('afip_code', '!=', 0)])
 
         return True
@@ -139,6 +140,7 @@ class wsafip_server(models.Model):
             self.env['afip.document_type'],
             doctype_list,
             can_create=True,
+            can_deactivate=False,
             domain=[])
 
         return True
@@ -169,6 +171,7 @@ class wsafip_server(models.Model):
             self.env['afip.optional_type'],
             currency_list,
             can_create=True,
+            can_deactivate=False,
             domain=[])
 
         return True

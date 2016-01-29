@@ -65,7 +65,10 @@ def check_afip_errors(response, no_raise=[]):
     return False
 
 
-def update_afip_code(model_obj, remote_list, can_create=True, domain=[]):
+def update_afip_code(model_obj, remote_list,
+                     can_create=True,
+                     can_deactivate=True,
+                     domain=[]):
     # Build set of AFIP codes
     rem_afip_code_set = set([i['afip_code'] for i in remote_list])
 
@@ -94,7 +97,7 @@ def update_afip_code(model_obj, remote_list, can_create=True, domain=[]):
         ).write({'active': True})
 
     to_deactive = [k for k, v in update_dict.items() if not v]
-    if to_deactive:
+    if can_deactivate and to_deactive:
         model_obj.search([
             ('afip_code', 'in', to_deactive),
             ('active', 'in', ['t', True])]).write({'active': False})

@@ -17,7 +17,7 @@
 
 - Check if company have the right currency
 - !assert {model: account.invoice, id: inv_ri2exp, string: Check if the company have the right currency}:
-    - company_id.currency_id.name == 'ARS'
+    - company_id.currency_id.name == 'EUR'
 
 - Validate invoice
 - !workflow {model: account.invoice, action: invoice_open, ref: inv_ri2exp}

@@ -41,5 +41,5 @@
 
 - Update database values and create journal.
 - !python {model: wsafip.server}: |
-    self.browse(cr, uid, ref("wsfex_homo")).wsfex_update_journals(ref("fex_connection_ar_0"), test='1')
+        self.browse(cr, uid, ref("wsfex_homo")).with_context(company_id=ref('l10n_ar_invoice.com_ivari')}).wsfex_update_journals(ref("fex_connection_ar_0"), test='1', )
 
