@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from openerp.osv import fields, osv
+from openerp import fields, models, api
 from random import randint
 import xml.etree.ElementTree as ET
 from dateutil.parser import parse as dateparse
@@ -28,78 +28,76 @@ _intmin = -2147483648
 _intmax = 2147483647
 
 
-class wsafip_connection(osv.osv):
-    def _get_state(self, cr, uid, ids, fields_name, arg, context=None):
-        r = {}
-        for auth in self.browse(cr, uid, ids):
-            if False in (auth.uniqueid, auth.generationtime,
-                         auth.expirationtime, auth.token, auth.sign):
-                _logger.info("Disconnected from AFIP.")
-                r[auth.id] = 'disconnected'
-            elif not (dateparse(auth.generationtime) - timedelta(0, 5) <
-                      datetime.now()):
-                _logger.warning("clockshifted. Server: %s, Now: %s" % (
-                    str(dateparse(auth.generationtime)), str(datetime.now())))
-                _logger.warning("clockshifted."
-                                " Please syncronize your host to a NTP server.")
-                r[auth.id] = 'clockshifted'
-            elif datetime.now() < dateparse(auth.expirationtime):
-                r[auth.id] = 'connected'
-            else:
-                _logger.info("Invalid Connection from AFIP.")
-                r[auth.id] = 'invalid'
-        return r
-
+class wsafip_connection(models.Model):
     _name = "wsafip.connection"
-    _columns = {
-        'name': fields.char(
-            'Name', size=64),
-        'partner_id': fields.many2one(
-            'res.partner', 'Partner'),
-        'server_id': fields.many2one(
-            'wsafip.server', 'Service Server'),
-        'logging_id': fields.many2one(
-            'wsafip.server', 'Authorization Server'),
-        'certificate': fields.many2one(
-            'crypto.certificate', 'Certificate Signer'),
-        'uniqueid': fields.integer(
-            'Unique ID', readonly=True),
-        'token': fields.text(
-            'Token', readonly=True),
-        'sign': fields.text(
-            'Sign', readonly=True),
-        'generationtime': fields.datetime(
-            'Generation Time', readonly=True),
-        'expirationtime': fields.datetime(
-            'Expiration Time', readonly=True),
-        'state': fields.function(_get_state,
-                                 method=True,
-                                 string='Status',
-                                 type='selection',
-                                 selection=[
-                                     ('clockshifted', 'Clock shifted'),
-                                     ('connected', 'Connected'),
-                                     ('disconnected', 'Disconnected'),
-                                     ('invalid', 'Invalid'),
-                                 ],
-                                 readonly=True),
-        'batch_sequence_id': fields.many2one(
-            'ir.sequence', 'Batch Sequence', readonly=False),
-    }
 
-    _defaults = {
-        'partner_id': lambda self, cr, uid, c:
-        self.pool.get('res.users').browse(
-            cr, uid, [uid], c)[0].company_id.partner_id.id,
-    }
+    name = fields.Char('Name', size=64)
+    partner_id = fields.Many2one(
+        'res.partner',
+        'Partner',
+        default='_get_default_partner')
+    server_id = fields.Many2one('wsafip.server', 'Service Server')
+    logging_id = fields.Many2one('wsafip.server', 'Authorization Server')
+    certificate = fields.Many2one('crypto.certificate', 'Certificate Signer')
+    uniqueid = fields.Integer('Unique ID', readonly=True)
+    token = fields.Text('Token', readonly=True)
+    sign = fields.Text('Sign', readonly=True)
+    generationtime = fields.Datetime('Generation Time', readonly=True)
+    expirationtime = fields.Datetime('Expiration Time', readonly=True)
+    state = fields.Selection(
+        compute='_get_state',
+        string='Status',
+        selection=[
+            ('clockshifted', 'Clock shifted'),
+            ('connected', 'Connected'),
+            ('disconnected', 'Disconnected'),
+            ('invalid', 'Invalid'),
+        ], readonly=True)
+    batch_sequence_id = fields.Many2one(
+        'ir.sequence',
+        'Batch Sequence', readonly=False)
 
-    def login(self, cr, uid, ids, context=None):
-        state = self._get_state(cr, uid, ids, None, None)
+    @api.multi
+    def _get_state(self):
+        for conn in self:
+            conn.state = self.get_state()
 
-        for ws in self.browse(cr, uid, [_id for _id, _stat in state.items()
-                                        if _stat not in
-                                        ['connected', 'clockshifted']]):
-            aaclient = Client(ws.logging_id.url+'?WSDL')
+    @api.multi
+    @api.model
+    def get_state(self):
+        self.ensure_one()
+
+        conn = self
+        if False in (conn.uniqueid, conn.generationtime,
+                     conn.expirationtime, conn.token, conn.sign):
+            _logger.info("Disconnected from AFIP.")
+            return 'disconnected'
+        elif not (dateparse(conn.generationtime) - timedelta(0, 5)
+                  < datetime.now()):
+            _logger.warning("clockshifted. Server: %s, Now: %s" % (
+                str(dateparse(conn.generationtime)), str(datetime.now())))
+            _logger.warning("clockshifted."
+                            " Please syncronize your host to a NTP server.")
+            return 'clockshifted'
+        elif datetime.now() < dateparse(conn.expirationtime):
+            return 'connected'
+        else:
+            _logger.info("Invalid Connection from AFIP.")
+            return 'invalid'
+
+    @api.model
+    def _get_default_partner(self):
+        user_mod = self.env['res.users']
+        return user_mod.browse(self.env.uid).company_id.partner_id.id
+
+    @api.multi
+    def login(self):
+
+        for conn in self:
+            if conn.get_state() in ('connected', 'clockshifted'):
+                continue
+
+            aaclient = Client(conn.logging_id.url+'?WSDL')
 
             uniqueid = randint(_intmin, _intmax)
             msg = _login_message.format(
@@ -108,9 +106,9 @@ class wsafip_connection(osv.osv):
                     datetime.now(tzlocal()) - timedelta(0, 60)).isoformat(),
                 expirationtime=(
                     datetime.now(tzlocal()) + timedelta(0, 60)).isoformat(),
-                service=ws.server_id.code
+                service=conn.server_id.code
             )
-            msg = ws.certificate.smime(msg)[ws.certificate.id]
+            msg = conn.certificate.smime(msg)[conn.certificate.id]
             head, body, end = msg.split('\n\n')
 
             response = aaclient.service.loginCms(in0=body)
@@ -133,32 +131,32 @@ class wsafip_connection(osv.osv):
             del auth_data['destination']
 
             _logger.info("Successful Connection to AFIP.")
-            self.write(cr, uid, ws.id, auth_data)
+            conn.write(auth_data)
 
-    def get_auth(self, cr, uid, ids, context=None):
-        r = {}
-        for auth in self.browse(cr, uid, ids):
-            if auth.partner_id.document_type_id.name != 'CUIT':
-                raise osv.except_osv(
-                    _('Error'),
-                    _('Selected partner has not CUIT. Need one to connect.'))
-            r[auth.id] = {
-                'Token': auth.token.encode('ascii'),
-                'Sign': auth.sign.encode('ascii'),
-                'Cuit': auth.partner_id.document_number,
-            }
-        if len(ids) == 1:
-            return r[ids[0]]
-        else:
-            return r
+    @api.multi
+    def get_auth(self):
+        self.ensure_one()
+        conn = self
 
-    def do_login(self, cr, uid, ids, context=None):
+        if conn.partner_id.document_type_id.name != 'CUIT':
+            raise Warning(
+                _('Selected partner has not CUIT. Need one to connect.'))
+        return {
+            'Token': conn.token.encode('ascii'),
+            'Sign': conn.sign.encode('ascii'),
+            'Cuit': conn.partner_id.document_number,
+        }
+
+    @api.multi
+    def do_login(self):
+        self.ensure_one()
+
         try:
-            self.login(cr, uid, ids)
+            self.login()
         except X509Error, m:
-            raise osv.except_osv(_('Certificate Error'), _(m))
+            raise Warning(_('Certificate Error: %s') % m)
         except Exception, e:
-            raise osv.except_osv(_('Unknown Error'), _("%s" % e))
+            raise Warning(_('Unknown Error: %s') % e)
 
         return {}
 

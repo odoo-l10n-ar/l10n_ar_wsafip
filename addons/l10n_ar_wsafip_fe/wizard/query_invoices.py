@@ -73,7 +73,7 @@ class query_invoices(models.TransientModel):
     @api.onchange('journal_id')
     def onchange_journal_id(self):
         self.ensure_one()
-        num_items = self.journal_id.afip_items_generated
+        num_items = self.journal_id.wsafip_items_generated
         self.first_invoice_number = min(self.first_invoice_number, num_items)
         self.last_invoice_number = num_items
 
@@ -148,8 +148,8 @@ class query_invoices(models.TransientModel):
             invs.write({
                 'date_invoice': _fch_(r['CbteFch']),
                 'internal_number': number_format % inv_number,
-                'afip_cae': r['CodAutorizacion'],
-                'afip_cae_due': _fch_(r['FchProceso']),
+                'wsafip_cae': r['CodAutorizacion'],
+                'wsafip_cae_due': _fch_(r['FchProceso']),
                 'afip_service_start': _fch_(r['FchServDesde']),
                 'afip_service_end': _fch_(r['FchServHasta']),
                 'amount_total': r['ImpTotal'],
@@ -187,8 +187,8 @@ class query_invoices(models.TransientModel):
                 'journal_id': qi.journal_id.id,
                 'partner_id': partner.id,
                 'date_invoice': _fch_(r['CbteFch']),
-                'afip_cae': r['CodAutorizacion'],
-                'afip_cae_due': _fch_(r['FchProceso']),
+                'wsafip_cae': r['CodAutorizacion'],
+                'wsafip_cae_due': _fch_(r['FchProceso']),
                 'afip_service_start': _fch_(r['FchServDesde']),
                 'afip_service_end': _fch_(r['FchServHasta']),
                 'amount_total': r['ImpTotal'],
@@ -228,9 +228,10 @@ class query_invoices(models.TransientModel):
     @api.multi
     def execute(self):
         v_r = []
+        import pdb; pdb.set_trace()
         for qi in self:
-            conn = qi.journal_id.afip_connection_id
-            serv = qi.journal_id.afip_connection_id.server_id
+            conn = qi.journal_id.wsafip_connection_id
+            serv = qi.journal_id.wsafip_connection_id.server_id
 
             if qi.first_invoice_number > qi.last_invoice_number:
                 raise Warning(u'Qrong invoice range numbers\n'
@@ -256,7 +257,7 @@ class query_invoices(models.TransientModel):
 
             if qi.update_sequence:
                 qi.journal_id.sequence_id.number_next = \
-                    max(qi.journal_id.afip_items_generated+1,
+                    max(qi.journal_id.wsafip_items_generated+1,
                         qi.journal_id.sequence_id.number_next)
                 _logger.debug("Update invoice journal number to: %i" %
                               (qi.journal_id.sequence_id.number_next))

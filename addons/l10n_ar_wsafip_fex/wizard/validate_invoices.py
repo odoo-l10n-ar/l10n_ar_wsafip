@@ -53,7 +53,7 @@ class validate_invoices(osv.osv_memory):
             inv_ids = invoice_obj.search(cr, uid,
                                          [('journal_id', '=', journal_id),
                                           ('state', '!=', 'draft'),
-                                          ('afip_cae', '=', False),
+                                          ('wsafip_cae', '=', False),
                                           ('number', '>=', number_format %
                                            qi.first_invoice_number),
                                           ('number', '<=', number_format %

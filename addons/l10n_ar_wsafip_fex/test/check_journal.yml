@@ -1,0 +1,23 @@
+-
+  Update database values and create journal.
+  ## !python {model: account.journal, search: "[('journal_class_id.code','=','FVE'), ('company_id','=',ref('l10n_ar_invoice.com_ivari'))]"}: |
+-
+  !python {model: res.company, id: l10n_ar_invoice.com_ivari}: |
+        self
+        journal = self.env['account.journal'].search([('journal_class_id.code','=','FVE'), ('company_id','=',self.id)])
+        journal.get_wsafip_state()
+        journal.get_wsafip_items_generated()
+        if journal.wsafip_state == 'unsync':
+                wiz = self.env['l10n_ar_wsafip_fe.query_invoices'].create({
+                        'journal_id': journal.id,
+                        'first_invoice_number': journal.sequence_id.number_next,
+                        'last_invoice_number': journal.wsafip_items_generated,
+                        'update_invoices': True,
+                        'update_sequence': True,
+                        'update_domain': 'by number',
+                        'create_invoices': False,
+                })
+                wiz.execute()
+        assert journal.wsafip_state == 'connected', 'Server is not connected'
+        assert journal.wsafip_items_generated >= 0, 'Trouble getting number of items'
+

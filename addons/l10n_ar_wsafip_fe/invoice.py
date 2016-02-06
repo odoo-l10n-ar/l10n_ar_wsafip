@@ -29,20 +29,15 @@ def _get_parents(child, parents=[]):
 class account_invoice(models.Model):
     _inherit = "account.invoice"
 
-    afip_batch_number = fields.Integer('AFIP Batch number',
-                                       readonly=True,
-                                       copy=False)
-    afip_cae = fields.Char('CAE number',
-                           size=24,
-                           readonly=True,
-                           copy=False)
-    afip_cae_due = fields.Date('CAE due',
-                               readonly=True,
-                               copy=False)
-    afip_error_id = fields.Many2one('wsafip.error',
-                                    string='Web Service Status',
-                                    readonly=True,
-                                    copy=False)
+    wsafip_cae = fields.Char(
+        'CAE number',
+        size=24,
+        readonly=True,
+        copy=False)
+    wsafip_cae_due = fields.Date(
+        'CAE due',
+        readonly=True,
+        copy=False)
     state = fields.Selection(selection_add=[('delayed',
                                              'Delay WS Validation')])
 
@@ -75,15 +70,15 @@ class account_invoice(models.Model):
 
         inv = self
         jou = inv.journal_id
-        conn = jou.afip_connection_id
+        conn = jou.wsafip_connection_id
         if conn:
-            if (jou.afip_items_generated + 1 != jou.sequence_id.number_next):
+            if (jou.wsafip_items_generated + 1 != jou.sequence_id.number_next):
                 raise ValidationError(
                     _('La AFIP espera que el próximo número de secuencia'
                       ' sea %i, pero el sistema indica que será %i. '
                       'Hable inmediatamente con su administrador del '
                       'sistema para resolver este problema.'
-                      ) % (jou.afip_items_generated + 1,
+                      ) % (jou.wsafip_items_generated + 1,
                            jou.sequence_id.number_next))
 
         return True
@@ -173,18 +168,18 @@ class account_invoice(models.Model):
         """
         inv = self
         journal = inv.journal_id
-        conn = journal.afip_connection_id
+        conn = journal.wsafip_connection_id
+
+        # Only process if set to connect to afip
+        if not conn:
+            return True
 
         # Ignore invoice if connection server is not type WSFE.
         if conn.server_id.code != 'wsfe':
             return True
 
         # Ignore journals with cae
-        if inv.afip_cae and inv.afip_cae_due:
-            return True
-
-        # Only process if set to connect to afip
-        if not conn:
+        if inv.wsafip_cae and inv.wsafip_cae_due:
             return True
 
         # Take the last number of the "number".
@@ -209,14 +204,14 @@ class account_invoice(models.Model):
             raise ValidationError(
                 _('Must defined afip_code for the currency.'))
 
-        req = self._new_request(journal, invoice_number)
+        req = self._fe_new_request(journal, invoice_number)
 
         res = conn.server_id.wsfe_get_cae(conn.id, [req])
 
         for k, v in res.iteritems():
             if 'CAE' in v:
-                self.afip_cae = v['CAE']
-                self.afip_cae_due = _conv_date(v['CAEFchVto'])
+                self.wsafip_cae = v['CAE']
+                self.wsafip_cae_due = _conv_date(v['CAEFchVto'])
                 self.internal_number = invoice_number
             else:
                 raise ValidationError(
@@ -228,7 +223,7 @@ class account_invoice(models.Model):
         return True
 
     @api.model
-    def _new_request(self, journal, invoice_number):
+    def _fe_new_request(self, journal, invoice_number):
         def _f_date(d):
             return d and d.replace('-', '')
 
@@ -273,9 +268,9 @@ class account_invoice(models.Model):
                 tax_filter=_iva_filter)['amount_tax'],
             'ImpTrib': inv.compute_all(
                 tax_filter=_not_iva_filter)['amount_tax'] or None,
-            'FchServDesde': _f_date(inv.afip_service_start)
+            'FchServDesde': _f_date(inv.wsafip_service_start)
             if inv.afip_concept != '1' else None,
-            'FchServHasta': _f_date(inv.afip_service_end)
+            'FchServHasta': _f_date(inv.wsafip_service_end)
             if inv.afip_concept != '1' else None,
             'FchVtoPago': _f_date(inv.date_due)
             if inv.afip_concept != '1' else None,
@@ -297,7 +292,7 @@ class account_invoice(models.Model):
         assert len(self) == 1, \
             'This option should only be used for a single id at a time.'
         self.sent = True
-        is_electronic = bool(self.journal_id.afip_connection_id)
+        is_electronic = bool(self.journal_id.wsafip_connection_id)
 
         return self.env['report'].get_action(
             self,
@@ -312,11 +307,11 @@ class account_invoice(models.Model):
 
         # Solve unsynchronized journals
         for jou in self.mapped('journal_id').filtered(lambda x:
-                                                      x.afip_state == 'unsync'):
+                                                      x.wsafip_state == 'unsync'):
             query = self.env['l10n_ar_wsafip_fe.query_invoices'].create({
                 'journal_id': jou.id,
                 'first_invoice_number': jou.sequence_id.number_next,
-                'last_invoice_number': jou.afip_items_generated,
+                'last_invoice_number': jou.wsafip_items_generated,
                 'update_invoices': True,
                 'update_sequence': True,
                 'update_domain': 'by number',
@@ -327,7 +322,7 @@ class account_invoice(models.Model):
         # Validating invoices
         for inv in self.search(
             [
-                ('journal_id.afip_connection_id.server_id.code', '=', 'wsfe'),
+                ('journal_id.wsafip_connection_id.server_id.code', '=', 'wsfe'),
                 ('state', '=', 'delayed'),
             ]
         ):

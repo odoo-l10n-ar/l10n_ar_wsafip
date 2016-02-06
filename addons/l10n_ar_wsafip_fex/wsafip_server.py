@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from openerp import models, api
+from openerp import models, api, _
 from openerp.exceptions import Warning
 import logging
 from openerp.addons.l10n_ar_wsafip.tools import service, check_afip_errors
@@ -10,6 +10,7 @@ logging.getLogger('suds.transport').setLevel(logging.DEBUG)
 
 fex_service = service('wsfex')
 fex_service_without_auth = service('wsfex', without_auth=True)
+
 
 class wsafip_server(models.Model):
     _inherit = "wsafip.server"
@@ -26,20 +27,25 @@ class wsafip_server(models.Model):
         """
         2.1 Autorizador (FEXAuthorize)
         """
+        print invoice
         response = service.FEXAuthorize(Auth=auth,
                                         Cmp=invoice)
         check_afip_errors(response)
+
+        if hasattr(response, 'FEXErr'):
+            raise Warning(_('AFIP error. %s') % (response.FEXErr.ErrMsg))
+
         return response
 
     @api.multi
     @fex_service
     def wsfex_query_invoice(self, service, auth,
-                            cbte_tipo, punto_vta, cbte_nro):
+                            cbte_tipo, cbte_nro, punto_vta):
         """
         2.2 Recuperador de Comprobante (FEXGetCMP)
         """
         response = service.FEXGetCMP(Auth=auth,
-                                     Cmp={'Cbte_Tipo': cbte_tipo,
+                                     Cmp={'Cbte_tipo': cbte_tipo,
                                           'Punto_vta': punto_vta,
                                           'Cbte_nro': cbte_nro})
         check_afip_errors(response)
@@ -57,13 +63,14 @@ class wsafip_server(models.Model):
 
     @api.multi
     @fex_service
-    def wsfex_get_last_invoice_number(self, service, auth):
+    def wsfex_get_last_invoice_number(self, service, auth, pos, cte):
         """
         2.4 Recuperador delúltimo Cbte_nroautorizado(FEXGetLast_CMP)
         """
+        auth.update({'Pto_venta': pos, 'Cbte_Tipo': cte})
         response = service.FEXGetLast_CMP(Auth=auth)
         check_afip_errors(response)
-        return response
+        return response.FEXResult_LastCMP.Cbte_nro
 
     @api.multi
     @fex_service
@@ -262,6 +269,21 @@ class wsafip_server(models.Model):
 
     @api.multi
     @fex_service_without_auth
+    def wsfex_get_status(self, service):
+        """
+        AFIP Description: Método Dummy para verificación de funcionamiento
+        de infraestructura (FEXDummy)
+        """
+        _logger.info('Get status from AFIP Web service')
+
+        response = service.FEXDummy()
+
+        return (response.AuthServer,
+                response.AppServer,
+                response.DbServer)
+
+    @api.multi
+    @fex_service_without_auth
     def wsfex_dummy(self, service):
         """
         2.16 MétodoDummy para verificación de funcionamiento de
@@ -281,47 +303,48 @@ class wsafip_server(models.Model):
     @api.one
     def wsfex_update_countries(self, conn_id):
         country_cuit = self.wsfex_get_country_cuit_codes(conn_id)
+        country_codes = {
+            v: k for k, v in self.wsfex_get_country_codes(conn_id).items()}
+        countries = set(country_cuit.keys() + country_codes.keys())
 
-        country_mod = self.env['res.country']
+        destination_mod = self.env['afip.destination']
 
         CUIT_FISICA = u'Persona F\xedsica'
         CUIT_JURIDICA = u'Persona Jur\xeddica'
         CUIT_OTRO = u'Otro tipo de Entidad'
-        cou_ignore = [
-            'REPUBLICA',
-            'ZONA',
-            'LIBRE',
-            'ARCHIPIELAGO',
-            'DE',
-            'ISLA',
-            'ESTADOS',
-        ]
 
-        for cou in country_cuit:
-            cuit_fisica = country_cuit[cou].get(CUIT_FISICA, False)
-            cuit_juridica = country_cuit[cou].get(CUIT_JURIDICA, False)
-            cuit_otro = country_cuit[cou].get(CUIT_OTRO, False)
+        for cou in countries:
+            if cou in country_cuit:
+                cuit_fisica = country_cuit[cou].get(CUIT_FISICA, False)
+                cuit_juridica = country_cuit[cou].get(CUIT_JURIDICA, False)
+                cuit_otro = country_cuit[cou].get(CUIT_OTRO, False)
+            else:
+                cuit_fisica = False
+                cuit_juridica = False
+                cuit_otro = False
+            afip_code = country_codes.get(cou, False)
 
-            if not (cuit_fisica and cuit_juridica and cuit_otro):
-                continue
+            destination = destination_mod.search(
+                ['|', ('afip_code', '=', afip_code),
+                 ('afip_cuit_person', '=', cuit_fisica)])
 
-            cou_names = [ c for c in cou.split(' ') if c not in cou_ignore ]
-            country = country_mod.search(['|', '|', '|',
-                ('cuit_fisica','=',cuit_fisica),
-                ('cuit_juridica','=',cuit_juridica),
-                ('cuit_otro','=',cuit_otro),
-                ('name','in',cou_names),
-            ])
-            if not country:
-                _logger.info('Can\'t find country name "%s"' % cou)
-            elif len(country) == 1:
-                country.write({
-                    'cuit_fisica': cuit_fisica,
-                    'cuit_juridica': cuit_juridica,
-                    'cuit_otro': cuit_otro,
+            if not destination:
+                destination.create({
+                    'name': cou,
+                    'afip_cuit_person': cuit_fisica,
+                    'afip_cuit_company': cuit_juridica,
+                    'afip_cuit_other': cuit_otro,
+                    'afip_code': afip_code,
                 })
             else:
-                _logger.error('Multiple countries name "%s"' % cou)
+                destination.write({
+                    'name': cou,
+                    'afip_code': afip_code,
+                    'afip_cuit_person': cuit_fisica,
+                    'afip_cuit_company': cuit_juridica,
+                    'afip_cuit_other': cuit_otro,
+                    'active': True,
+                })
 
     @api.one
     def wsfex_update_currencies(self, conn_id):
@@ -333,9 +356,9 @@ class wsafip_server(models.Model):
         for cur in currencies:
             description = currencies[cur]['description']
             date_from = currencies[cur]['date_from']
-            date_to = currencies[cur]['date_to']
+            # date_to = currencies[cur]['date_to']
 
-            cur_obj = currency_mod.search([('afip_code','=',cur)])
+            cur_obj = currency_mod.search([('afip_code', '=', cur)])
 
             if cur_obj:
                 _logger.info('Update currency %s' % cur)
@@ -363,8 +386,6 @@ class wsafip_server(models.Model):
 
         for ty in invoice_types:
             description = invoice_types[ty]['description']
-            date_from = invoice_types[ty]['date_from']
-            date_to = invoice_types[ty]['date_to']
 
             tem_obj = template_mod.search([('code', '=', ty)])
 
@@ -383,10 +404,9 @@ class wsafip_server(models.Model):
 
         for ty in export_types:
             description = export_types[ty]['description']
-            date_from = export_types[ty]['date_from']
-            date_to = export_types[ty]['date_to']
 
-            con_obj = concept_mod.search([('afip_code' ,'=', ty),'|',
+            con_obj = concept_mod.search([('afip_code', '=', ty),
+                                          '|',
                                           ('active', '=', False),
                                           ('active', '=', True)])
 
@@ -405,15 +425,17 @@ class wsafip_server(models.Model):
     def wsfex_update_units(self, conn_id):
         units = self.wsfex_get_unity_type_codes(conn_id)
 
-        unit_mod = self.env['product.uom']
+        uom_mod = self.env['afip.uom']
 
         for uom in units:
             description = units[uom]['description']
-            date_from = units[uom]['date_from']
-            date_to = units[uom]['date_to']
 
-            uom_obj = unit_mod.search([('name', '=', description)])
-            uom_obj.write({'afip_code': uom})
+            uom_obj = uom_mod.search([('name', '=', description)])
+
+            if uom_obj:
+                uom_obj.write({'afip_code': uom})
+            else:
+                uom_obj.create({'name': description, 'afip_code': uom})
 
     @api.one
     def wsfex_update_languages(self, conn_id):
@@ -423,83 +445,98 @@ class wsafip_server(models.Model):
 
         for l in langs:
             description = langs[l]['description']
-            date_from = langs[l]['date_from']
-            date_to =  langs[l]['date_to']
 
             lang_obj = lang_mod.search([('name', '=', description)])
-            lang_obj.write({'afip_code': l})
+
+            if lang_obj:
+                lang_obj.write({'afip_code': l})
 
     @api.one
     def wsfex_update_incoterms(self, conn_id):
         incoterms = self.wsfex_get_incoterms_codes(conn_id)
 
-        inco_mod = self.env['stock.incoterms']
+        inco_mod = self.env['afip.incoterm']
 
         for i in incoterms:
             description = incoterms[i]['description']
-            date_from = incoterms[i]['date_from']
-            date_to = incoterms[i]['date_to']
 
             inco_obj = inco_mod.search([('name', '=', description)])
-            inco_obj.write({'afip_code': i})
+            if inco_obj:
+                inco_obj.write({'afip_code': i})
+            else:
+                inco_obj.create({'name': description, 'afip_code': i})
 
     @api.one
     def wsfex_update_journals(self, conn_id, test=None):
         pos = self.wsfex_get_web_points_of_sale(conn_id) if not test else {
-                test: {
-                    'unactive': 'N',
-                    'date_to': '',
-                }
-            }
+            test: {'unactive': 'N', 'date_to': ''}
+        }
 
         jou_mod = self.env['account.journal']
-        company = self.env.context.get(
-            'company_id',
-            self.env['res.users'].browse(self.env.uid).company_id)
+        con_mod = self.env['wsafip.connection']
+
+        company = (
+            self.env['res.company'].search(
+                [('partner_id', '=', con_mod.browse(conn_id).partner_id.id)])
+            if 'company_id' not in self.env.context
+            else self.env['res.company'].browse(self.env.context['company_id']))
+        company_id = company.id
+
+        journal_class_e = self.env['afip.journal_class'].search(
+            [('afip_code', '=', 19)])
+
+        if not journal_class_e:
+            journal_class_e = self.env['afip.journal_class'].search(
+                [('afip_code', '=', 19), ('active', '=', False)])
+            journal_class_e.write({'active': True})
+
+        if not journal_class_e:
+            raise Warning("Can't create journals!")
 
         for po in pos:
             jou = jou_mod.search([
                 ('point_of_sale', '=', po),
-                ('journal_class_id.afip_code', '=', 19),
-                ('journal_class_id.type', '=', 'sale'),
+                ('journal_class_id', '=', journal_class_e.id),
+                ('company_id', '=', company_id),
             ])
 
-            import pdb; pdb.set_trace()
-            if jou:
-                continue
+            if len(jou)>1:
+                import pdb; pdb.set_trace()
 
-            journal_class_e = self.env['afip.journal_class'].search(
-                [('afip_code', '=', '019')])
-
-            if not journal_class_e:
-                journal_class_e = self.env['afip.journal_class'].search(
-                    [('afip_code', '=', '019'), ('active', '=', False)])
-
-            if not journal_class_e:
-                raise Warning("Can't create journals!")
-
-            new_sequence = self.env['l10n_ar_invoice.new_sequence']
-            new_seq = new_sequence.create({
+            if not jou:
+                new_sequence = self.env['l10n_ar_invoice.new_sequence']
+                new_seq = new_sequence.create({
                     'name': 'Factura [Venta E] (%04i-FVE)' % int(po),
                     'code': 'ws_afip_sequence',
                     'prefix': '%04i' % int(po),
                     'suffix': '-FVE',
-                    'company_id': company.id,
-                    'builder_id': False })
-            new_seq.doit()
+                    'company_id': company_id,
+                    'builder_id': False})
+                new_seq.doit()
 
-            new_journal = self.env['l10n_ar_invoice.new_journal']
-            new_jou = new_journal.create({
+                new_journal = self.env['l10n_ar_invoice.new_journal']
+                new_jou = new_journal.create({
                     'name': 'Factura [Venta E] (%04i-FVE)' % int(po),
                     'code': 'FVE%04i' % int(po),
                     'type': 'sale',
                     'journal_class_id': journal_class_e.id,
                     'point_of_sale': int(po),
                     'sequence_name': 'Factura [Venta E] (%04i-FVE)' % int(po),
-                    'company_id': company.id,
+                    'company_id': company_id,
                     'currency': False,
-                    'builder_id': False })
-            new_jou.doit()
+                    'builder_id': False})
+                new_jou.doit()
+
+                jou = jou_mod.search([
+                    ('point_of_sale', '=', po),
+                    ('journal_class_id.afip_code', '=', 19),
+                    ('journal_class_id.type', '=', 'sale'),
+                ])
+
+            for j in jou:
+                if not j.wsafip_connection_id:
+                    j.wsafip_connection_id = con_mod.browse(conn_id).filtered(
+                        lambda c: c.partner_id == company.partner_id)
 
     @api.one
     def wsfex_update(self, conn_id):

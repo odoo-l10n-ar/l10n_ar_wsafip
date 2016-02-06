@@ -98,7 +98,8 @@ class l10n_ar_wsafip_fe_config(osv.osv_memory):
                                            ws.wsfe_point_of_sale),
                                           ('type', '=', 'sale')])
 
-            journal_obj.write(cr, uid, jou_ids, {'afip_connection_id': conn_id})
+            journal_obj.write(cr, uid, jou_ids,
+                              {'wsafip_connection_id': conn_id})
 
             # Sincronizo el número de factura local con el remoto
             for journal in journal_obj.browse(cr, uid, jou_ids):

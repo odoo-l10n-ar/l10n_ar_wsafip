@@ -1,6 +1,55 @@
-- Parter de exportación
-- !record {model: res.partner, id: par_exp}:
-    name: El nombre que quieras S.A.
+- Set user
+- !context
+    uid: l10n_ar_wsafip.admin_wsafip
+
+-
+ All countries except Argentina
+-
+  !record {model: res.country.group, id: except_argentina}:
+    name: except_argentina
+    country_ids: !ref {search: "[('name','!=','Argentina')]"}
+
+-
+  Posición fiscal de exportación
+-
+  !record {model: account.fiscal.position, id: position_for_export}:
+    name: For export
+    auto_apply: True
+    country_group_id: except_argentina
+
+-
+ Tax replaces 0% IVA
+-
+  !record {model: account.fiscal.position.tax, id: clean_iva_0}:
+    position_id: position_for_export
+    tax_src_id: !ref {search: "[('description','=','IVA Ventas 0%')]"}
+
+-
+ Tax replaces 10% IVA
+-
+  !record {model: account.fiscal.position.tax, id: clean_iva_10}:
+    position_id: position_for_export
+    tax_src_id: !ref {search: "[('description','=','IVA Ventas 10.5%')]"}
+
+-
+ Tax replaces 21% IVA
+-
+  !record {model: account.fiscal.position.tax, id: clean_iva_21}:
+    position_id: position_for_export
+    tax_src_id: !ref {search: "[('description','=','IVA Ventas 21%')]"}
+
+-
+ Tax replaces 27% IVA
+-
+  !record {model: account.fiscal.position.tax, id: clean_iva_27}:
+    position_id: position_for_export
+    tax_src_id: !ref {search: "[('description','=','IVA Ventas 27%')]"}
+
+-
+  Parter de exportación
+-
+  !record {model: res.partner, id: par_exp}:
+    name: For export S.A.
     responsability_id: l10n_ar_invoice.res_EXT 
     document_type_id: l10n_ar_invoice.dt_CUIT
     document_number: 30712007288
@@ -9,5 +58,7 @@
     city: Miniapolis
     country_id: base.us
     zip: 55403
-
+    afip_destination_id: !ref {model: afip.destination, search: "[('afip_code','=','212')]"}
+    property_account_position: position_for_export
+    company_id: l10n_ar_invoice.com_ivari
 

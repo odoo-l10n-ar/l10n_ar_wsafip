@@ -210,15 +210,15 @@ width: inherit;
             <span t-field="o.fiscal_position"/>
         </p>
 
-        <div t-if="o.afip_cae" style="text-align:center">
-            <img t-att-src="'/report/barcode/?type=%s&amp;value=%s%02i%04i%014i%08i&amp;width=%s&amp;height=%s'%('I2of5', res_company.partner_id.document_number or '000000000', o.journal_id.journal_class_id.afip_code, o.journal_id.point_of_sale, int(o.afip_cae or 0), int(o.afip_cae_due!=False and o.afip_cae_due.replace('-','') or 0), 800, 100)"/>
-            <p><t t-esc="'%s%02i%04i%014i%08i'%(res_company.partner_id.document_number or '000000000', o.journal_id.journal_class_id.afip_code, o.journal_id.point_of_sale, int(o.afip_cae or 0), int(o.afip_cae_due!=False and o.afip_cae_due.replace('-','') or 0))"/></p>
+        <div t-if="o.wsafip_cae" style="text-align:center">
+            <img t-att-src="'/report/barcode/?type=%s&amp;value=%s%02i%04i%014i%08i&amp;width=%s&amp;height=%s'%('I2of5', res_company.partner_id.document_number or '000000000', o.journal_id.journal_class_id.afip_code, o.journal_id.point_of_sale, int(o.wsafip_cae or 0), int(o.wsafip_cae_due!=False and o.wsafip_cae_due.replace('-','') or 0), 800, 100)"/>
+            <p><t t-esc="'%s%02i%04i%014i%08i'%(res_company.partner_id.document_number or '000000000', o.journal_id.journal_class_id.afip_code, o.journal_id.point_of_sale, int(o.wsafip_cae or 0), int(o.wsafip_cae_due!=False and o.wsafip_cae_due.replace('-','') or 0))"/></p>
             <br/>
             <strong>CAE:</strong>
-            <span t-field="o.afip_cae"/>
+            <span t-field="o.wsafip_cae"/>
             <br/>
             <strong>CAE due:</strong>
-            <span t-field="o.afip_cae_due"/>
+            <span t-field="o.wsafip_cae_due"/>
         </div>
     </div>
 </template>

@@ -1,29 +1,42 @@
+- Set user
+- !context
+    uid: l10n_ar_wsafip.admin_wsafip
+
+#
 #
 #       Create an invoice from Resp Inscr to Extr.
 #
 - Create a simple invoice type E
 - !record {model: account.invoice, id: inv_ri2exp}:
     partner_id: par_exp
-    journal_id: !ref {search: "[('journal_class_id.code','=','FVE')]"}
+    journal_id: !ref {search: "[('journal_class_id.code','=','FVE'), ('company_id','=',ref('l10n_ar_invoice.com_ivari'))]"}
+    company_id: l10n_ar_invoice.com_ivari
+    afip_incoterm_id: !ref {search: "[('name','=','CIF')]"}
     invoice_line:
-      - quantity: 10.0
+      - account_id: !ref {model: account.account, search: "[('code','=','411000'), ('company_id','=',ref('l10n_ar_invoice.com_ivari'))]"}
+        name: '[PC3] Medium PC'
+        price_unit: 900.0
+        quantity: 10.0
         product_id: l10n_ar_invoice.prod_iva21
+        uos_id: product.product_uom_unit
         
 - Compute amount
 - !python {model: account.invoice}: |
     inv_id = [ref('inv_ri2exp')]
+    self.onchange_partner_id(cr, uid, [], 'sale', ref('par_exp'))
     self.view_init(cr, uid, inv_id, {})
+    inv = self.browse(cr, uid, inv_id)
     self.button_compute(cr, uid, inv_id)
 
 - Check if company have the right currency
 - !assert {model: account.invoice, id: inv_ri2exp, string: Check if the company have the right currency}:
-    - company_id.currency_id.name == 'EUR'
+    - company_id.currency_id.name == 'ARS'
 
 - Validate invoice
 - !workflow {model: account.invoice, action: invoice_open, ref: inv_ri2exp}
 
 - Check CAE invoice number
 - !assert {model: account.invoice, id: inv_ri2exp, string: CAE has been assigned}:
-    - afip_cae != ''
-    - afip_cae_due != ''
+    - wsafip_cae != ''
+    - wsafip_cae_due != ''
 

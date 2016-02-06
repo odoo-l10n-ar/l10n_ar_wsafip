@@ -25,12 +25,10 @@
             <field name="arch" type="xml">
                 <data>
                 <notebook position="inside">
-                    <page string="AFIP Web Service" attrs="{'invisible':[('afip_batch_number','=',None)]}">
+                    <page string="AFIP Web Service" attrs="{'invisible':[('wsafip_cae','=',False)]}">
                         <group>
-                            <field name='afip_batch_number' invisible="1" readonly="1"/>
-                            <field name='afip_cae' readonly="1"/>
-                            <field name='afip_cae_due' readonly="1"/>
-                            <field name='afip_error_id' readonly="1"/>
+                            <field name='wsafip_cae' readonly="1"/>
+                            <field name='wsafip_cae_due' readonly="1"/>
                         </group>
                     </page>
                 </notebook>

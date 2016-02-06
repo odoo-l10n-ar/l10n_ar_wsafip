@@ -40,8 +40,8 @@
 
 - Check CAE invoice number
 - !assert {model: account.invoice, id: inv_ri2ri_2iva, string: CAE has been assigned}:
-    - afip_cae != ''
-    - afip_cae_due != ''
+    - wsafip_cae != ''
+    - wsafip_cae_due != ''
 
 - Print invoice
 - !python {model: account.invoice}: |

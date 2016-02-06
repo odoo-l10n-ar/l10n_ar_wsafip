@@ -38,7 +38,6 @@ class wsafip_server(models.Model):
     Recuperador de cantidad máxima de registros FECAESolicitar /
     FECAEARegInformativo (FECompTotXRequest)
     """
-
     @api.multi
     @fe_service_without_auth
     def wsfe_get_status(self, service):

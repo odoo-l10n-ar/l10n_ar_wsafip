@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data> 
+	  <record model="country.group" id="except_argentina">
+		  <field name="name">Except Argentina</field>
+		  <field name="auto_apply" eval="True"/>
+	  </record>
+	  <record model="account.fiscal.position" id="fp_for_export">
+		  <field name="name">For export</field>
+		  <field name="auto_apply" eval="True"/>
+		  <field name="country_group_id"></field>
+	  </record>
+  </data>
+</openerp>
+<!-- vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4
+     -->

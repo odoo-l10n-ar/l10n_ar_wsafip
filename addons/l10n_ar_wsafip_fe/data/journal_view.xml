@@ -26,9 +26,9 @@
                 <page string="AFIP" position="inside">
                     <group colspan="2" col="2">
                         <separator string="Web Services" colspan="4"/>
-                        <field name='afip_connection_id'/>
-                        <field name='afip_state'/>
-                        <field name='afip_items_generated'/>
+                        <field name='wsafip_connection_id'/>
+                        <field name='wsafip_state'/>
+                        <field name='wsafip_items_generated'/>
                     </group>
                 </page>
             </field>
