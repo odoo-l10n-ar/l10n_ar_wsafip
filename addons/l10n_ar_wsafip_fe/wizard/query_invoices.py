@@ -227,40 +227,44 @@ class query_invoices(models.TransientModel):
 
     @api.multi
     def execute(self):
+        self.ensure_one()
+        qi = self
+
         v_r = []
-        import pdb; pdb.set_trace()
-        for qi in self:
-            conn = qi.journal_id.wsafip_connection_id
-            serv = qi.journal_id.wsafip_connection_id.server_id
+        conn = qi.journal_id.wsafip_connection_id
+        serv = qi.journal_id.wsafip_connection_id.server_id
 
-            if qi.first_invoice_number > qi.last_invoice_number:
-                raise Warning(u'Qrong invoice range numbers\n'
-                              u'Please, first invoice number must be less'
-                              u' than last invoice')
+        if serv.code != 'wsfe':
+            raise Warning(u'Wrong protocol')
 
-            for inv_number in range(qi.first_invoice_number,
-                                    qi.last_invoice_number+1):
-                r = serv.wsfe_query_invoice(
-                    conn,
-                    qi.journal_id.journal_class_id.afip_code,
-                    inv_number,
-                    qi.journal_id.point_of_sale
-                )
+        if qi.first_invoice_number > qi.last_invoice_number:
+            raise Warning(u'Qrong invoice range numbers\n'
+                          u'Please, first invoice number must be less'
+                          u' than last invoice')
 
-                if r and r['EmisionTipo'] == 'CAE':
-                    v_r.extend(qi._generate_cae(inv_number, r))
-                elif r:
-                    raise Warning("Emision type %s not implemented for %i" %
-                                  (r['EmisionTipo'], inv_number))
-                else:
-                    _logger.warning("Problem reading invoice %i" % inv_number)
+        for inv_number in range(qi.first_invoice_number,
+                                qi.last_invoice_number+1):
+            r = serv.wsfe_query_invoice(
+                conn,
+                qi.journal_id.journal_class_id.afip_code,
+                inv_number,
+                qi.journal_id.point_of_sale
+            )
 
-            if qi.update_sequence:
-                qi.journal_id.sequence_id.number_next = \
-                    max(qi.journal_id.wsafip_items_generated+1,
-                        qi.journal_id.sequence_id.number_next)
-                _logger.debug("Update invoice journal number to: %i" %
-                              (qi.journal_id.sequence_id.number_next))
+            if r and r['EmisionTipo'] == 'CAE':
+                v_r.extend(qi._generate_cae(inv_number, r))
+            elif r:
+                raise Warning("Emision type %s not implemented for %i" %
+                              (r['EmisionTipo'], inv_number))
+            else:
+                _logger.warning("Problem reading invoice %i" % inv_number)
+
+        if qi.update_sequence:
+            qi.journal_id.sequence_id.number_next = \
+                max(qi.journal_id.wsafip_items_generated+1,
+                    qi.journal_id.sequence_id.number_next)
+            _logger.debug("Update invoice journal number to: %i" %
+                          (qi.journal_id.sequence_id.number_next))
 
         return {
             'name': _('Invoices'),

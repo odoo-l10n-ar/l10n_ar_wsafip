@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from openerp import fields, models, api, _
+from openerp import models, api, _
 from openerp.exceptions import Warning
-from datetime import datetime
+from openerp.addons.l10n_ar_wsafip_fe.wizard.query_invoices import _fch_
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -26,179 +26,152 @@ class query_invoices(models.Model):
 
     @api.multi
     def execute(self):
+        self.ensure_one()
         invoice_obj = self.env['account.invoice']
+        partner_obj = self.env['res.partner']
 
-        for qi in self:
-            conn = qi.journal_id.wsafip_connection_id
-            serv = qi.journal_id.wsafip_connection_id.server_id
+        v_r = []
 
-            if serv.code != 'wsfex':
-                return super(query_invoice, self).execute()
+        qi = self
+        conn = qi.journal_id.wsafip_connection_id
+        serv = qi.journal_id.wsafip_connection_id.server_id
 
-            sequence = qi.journal_id.sequence_id
-            interpolation_dict = sequence._interpolation_dict()
-            interpolated_prefix = sequence._interpolate(
-                sequence.prefix or "", interpolation_dict)
-            interpolated_suffix = sequence._interpolate(
-                sequence.suffix or "", interpolation_dict)
-            number_format = "%s%%0%sd%s" % (
-                interpolated_prefix, qi.journal_id.sequence_id.padding,
-                interpolated_suffix)
+        if serv.code != 'wsfex':
+            return super(query_invoices, self).execute()
 
-            if qi.first_invoice_number > qi.last_invoice_number:
-                raise Warning(
-                    _(u'Qrong invoice range numbers'
-                      u'Please, first invoice number must be less '
-                      u'than last invoice'))
+        sequence = qi.journal_id.sequence_id
+        interpolation_dict = sequence._interpolation_dict()
+        interpolated_prefix = sequence._interpolate(
+            sequence.prefix or "", interpolation_dict)
+        interpolated_suffix = sequence._interpolate(
+            sequence.suffix or "", interpolation_dict)
+        number_format = "%s%%0%sd%s" % (
+            interpolated_prefix, qi.journal_id.sequence_id.padding,
+            interpolated_suffix)
 
-            v_r = []
-            for inv_number in range(qi.first_invoice_number,
-                                    qi.last_invoice_number+1):
-                r = serv.wsfex_query_invoice(
-                    conn.id,
-                    qi.journal_id.journal_class_id.afip_code,
-                    inv_number,
-                    qi.journal_id.point_of_sale)
+        if qi.first_invoice_number > qi.last_invoice_number:
+            raise Warning(
+                _(u'Qrong invoice range numbers'
+                    u'Please, first invoice number must be less '
+                    u'than last invoice'))
 
-                invoice_domain = eval(
-                    _queries[qi.update_domain],
-                    {},
-                    {'invoice_number': number_format % inv_number,
-                     'response': r.FEXResultGet}
-                )
+        for inv_number in range(qi.first_invoice_number,
+                                qi.last_invoice_number+1):
+            r = serv.wsfex_query_invoice(
+                conn.id,
+                qi.journal_id.journal_class_id.afip_code,
+                inv_number,
+                qi.journal_id.point_of_sale)
 
-                inv_ids = invoice_obj.search(
-                    [('journal_id', '=', qi.journal_id.id)] +
-                    invoice_domain)
+            invoice_domain = eval(
+                _queries[qi.update_domain],
+                {},
+                {'invoice_number': number_format % inv_number,
+                    'response': r.FEXResultGet}
+            )
 
-                if inv_ids and qi.update_invoices and len(inv_ids) == 1:
-                    # Update Invoice
-                    import pdb; pdb.set_trace()
-                    _logger.debug("Update invoice number: %s" % (
-                        number_format % inv_number))
-                    invoice_obj.write(cr, uid, inv_ids, {
-                        'date_invoice': _fch_(r['CbteFch']),
-                        'internal_number': number_format % inv_number,
-                        'wsafip_cae': r['CodAutorizacion'],
-                        'wsafip_cae_due': _fch_(r['FchProceso']),
-                        'afip_service_start': _fch_(r['FchServDesde']),
-                        'afip_service_end': _fch_(r['FchServHasta']),
-                        'amount_total': r['ImpTotal'],
-                    })
-                    msg = 'Updated from AFIP (%s)' % (
-                        number_format % inv_number)
-                    invoice_obj.message_post(
-                        cr, uid, inv_ids,
+            invoice = invoice_obj.search(
+                [('journal_id', '=', qi.journal_id.id)] +
+                invoice_domain)
+
+            if invoice and qi.update_invoices and len(invoice) == 1:
+                # Update Invoice
+                _logger.debug("Update invoice number: %s" % (
+                    number_format % inv_number))
+                invoice.write({
+                    'date_invoice': _fch_(r.FEXResultGet.Fecha_cbte),
+                    'internal_number': number_format % inv_number,
+                    'wsafip_cae': r.FEXResultGet.Cae,
+                    'wsafip_cae_due': r.FEXResultGet.Fch_venc_Cae,
+                    'amount_total': r.FEXResultGet.Imp_total,
+                })
+                msg = 'Updated from AFIP (%s)' % (
+                    number_format % inv_number)
+                invoice.message_post(
+                    body=msg,
+                    subtype="l10n_ar_wsafip_fe.mt_invoice_ws_action")
+                v_r.append(invoice.id)
+            elif invoice and qi.update_invoices and len(invoice) > 1:
+                # Duplicated Invoices
+                _logger.info("Duplicated invoice number: %s %s" %
+                             (number_format % inv_number, tuple(invoice.ids)))
+                msg = 'Posible duplication from AFIP (%s)' % (
+                    number_format % inv_number)
+                for inv in invoice:
+                    invoice.message_post(
                         body=msg,
-                        subtype="l10n_ar_wsafip_fe.mt_invoice_ws_action",
-                        context=context)
-                    v_r.extend(inv_ids)
-                elif inv_ids and qi.update_invoices and len(inv_ids) > 1:
-                    # Duplicated Invoices
-                    import pdb; pdb.set_trace()
-                    _logger.info("Duplicated invoice number: %s %s" %
-                                    (number_format % inv_number, tuple(inv_ids)
-                                    ))
-                    msg = 'Posible duplication from AFIP (%s)' % (
-                        number_format % inv_number)
-                    for inv_id in inv_ids:
-                        invoice_obj.message_post(
-                            cr, uid, inv_id,
-                            body=msg,
-                            subtype=_mt_invoice_ws_action,
-                            context=context)
-                elif not inv_ids and qi.create_invoices:
-                    import pdb; pdb.set_trace()
-                    partner_id = partner_obj.search(cr, uid, [
-                        ('document_type_id.afip_code', '=', r['DocTipo']),
-                        ('document_number', '=', r['DocNro']),
+                        subtype=_mt_invoice_ws_action)
+            elif not invoice and qi.create_invoices:
+                partner = partner_obj.search([
+                    ('name', '=', r.FEXResultGet.Cliente),
+                    '|', '|', '|',
+                    ('afip_destination_id.afip_cuit_company',
+                     '=', r.FEXResultGet.Cuit_pais_cliente),
+                    ('afip_destination_id.afip_cuit_person',
+                     '=', r.FEXResultGet.Cuit_pais_cliente),
+                    ('afip_destination_id.afip_cuit_other',
+                     '=', r.FEXResultGet.Cuit_pais_cliente),
+                    ('vat', '=', r.FEXResultGet.Id_impositivo),
+                ])
+
+                if not partner:
+                    # Create partner
+                    destination = partner_obj.destination_id.search([
+                        ('afip_cuit_company',
+                         '=', r.FEXResultGet.Cuit_pais_cliente),
+                        ('afip_cuit_person',
+                         '=', r.FEXResultGet.Cuit_pais_cliente),
+                        ('afip_cuit_other',
+                         '=', r.FEXResultGet.Cuit_pais_cliente),
                     ])
-                    if partner_id:
-                        # Take partner
-                        partner_id = partner_id[0]
-                    else:
-                        # Create partner
-                        _logger.debug("Creating partner doc number: %s"
-                                        % r['DocNro'])
-                        document_type_id = document_type_obj.search(
-                            cr, uid, [('afip_code', '=', r['DocTipo'])])
-                        assert len(document_type_id) == 1
-                        document_type_id = document_type_id[0]
-                        partner_id = partner_obj.create(cr, uid, {
-                            'name': '%s' % r['DocNro'],
-                            'document_type_id': document_type_id,
-                            'document_number': r['DocNro'],
-                        })
-                    _logger.debug("Creating invoice number: %s" %
-                                    (number_format % inv_number))
-                    partner = partner_obj.browse(cr, uid, partner_id)
-                    if not partner.property_account_receivable.id:
-                        raise osv.except_osv(
-                            _(u'Partner has not set a receivable account'),
-                            _(u'Please, first set the receivable account '
-                                u'for %s') % partner.name)
-
-                    inv_id = invoice_obj.create(cr, uid, {
-                        'company_id': qi.journal_id.company_id.id,
-                        'account_id':
-                        partner.property_account_receivable.id,
-                        'internal_number': number_format % inv_number,
-                        'name':
-                        'Created from AFIP (%s)' % (
-                            number_format % inv_number),
-                        'journal_id': qi.journal_id.id,
-                        'partner_id': partner_id,
-                        'date_invoice': _fch_(r['CbteFch']),
-                        'afip_cae': r['CodAutorizacion'],
-                        'afip_cae_due': _fch_(r['FchProceso']),
-                        'afip_service_start': _fch_(r['FchServDesde']),
-                        'afip_service_end': _fch_(r['FchServHasta']),
-                        'amount_total': r['ImpTotal'],
-                        'state': 'draft',
+                    partner = partner_obj.create({
+                        'name': '%s' % r.FEXResultGet.Cliente,
+                        'afip_destination_id': destination or False,
+                        'vat': r.FEXResultGet.Cuit_pais_cliente
+                        if not destination else False,
                     })
-                    for iva in r['Iva']:
-                        tax_id = tax_obj.search(cr, uid, [
-                            ('tax_code_id.afip_code','=',iva['Id']),
-                            ('type_tax_use','=','sale')
-                        ])
-                        line_vals=invoice_line_obj.product_id_change(
-                            cr, uid, False,
-                            qi.default_product_id.id
-                            if r['Concepto'] == 1
-                            else qi.default_service_id.id,
-                            False,
-                            qty=1,
-                            name=_('AFIP declaration'),
-                            type='out_invoice',
-                            price_unit=iva['BaseImp'],
-                            partner_id=partner_id,
-                        )
-                        line_vals['value']['invoice_id']=inv_id
-                        line_vals['value']['tax_id']=(6,0,tax_id)
-                        line_vals['value']['price_unit']=iva['BaseImp']
-                        invoice_line_obj.create(cr, uid, line_vals['value'])
 
-                    msg = 'Created from AFIP (%s)' % (
-                        number_format % inv_number)
-                    invoice_obj.message_post(
-                        cr, uid, inv_id,
-                        body=msg,
-                        subtype=_mt_invoice_ws_action,
-                        context=context)
-                    v_r.append(inv_id)
-                else:
-                    _logger.debug("Ignoring invoice: %s" %
-                                    (number_format % inv_number))
+                _logger.debug("Creating invoice number: %s" %
+                              (number_format % inv_number))
 
-            if qi.update_sequence:
-                import pdb
-                pdb.set_trace()
-                qi.journal_id.sequence_id.number_next = \
-                    max(qi.journal_id.wsafip_items_generated+1,
-                        qi.journal_id.sequence_id.number_next)
-                _logger.debug("Update invoice journal number to: %i" %
-                              (qi.journal_id.sequence_id.number_next))
+                if not partner.property_account_receivable.id:
+                    raise Warning(
+                        _(u'Partner has not set a receivable account'
+                          u'Please, first set the receivable account '
+                          u'for %s') % partner.name)
 
+                invoice = invoice_obj.create({
+                    'company_id': qi.journal_id.company_id.id,
+                    'account_id':
+                    partner.property_account_receivable.id,
+                    'internal_number': number_format % inv_number,
+                    'name':
+                    'Created from AFIP (%s)' % (
+                        number_format % inv_number),
+                    'journal_id': qi.journal_id.id,
+                    'partner_id': partner.id,
+                    'date_invoice': _fch_(r.FEXResultGet.Fecha_cbte),
+                    'afip_cae': r.FEXResultGet.Cae,
+                    'afip_cae_due': r.FEXResultGet.Fch_venc_Cae,
+                    'amount_total': r.FEXResultGet.Imp_total,
+                    'state': 'draft',
+                })
+                msg = 'Created from AFIP (%s)' % (
+                    number_format % inv_number)
+                invoice.message_post(
+                    body=msg,
+                    subtype=_mt_invoice_ws_action)
+                v_r.append(invoice.id)
+            else:
+                _logger.debug("Ignoring invoice: %s" %
+                              (number_format % inv_number))
+
+        if qi.update_sequence:
+            qi.journal_id.sequence_id.number_next = \
+                max(qi.journal_id.wsafip_items_generated+1,
+                    qi.journal_id.sequence_id.number_next)
+            _logger.debug("Update invoice journal number to: %i" %
+                          (qi.journal_id.sequence_id.number_next))
 
         return {
             'name': _('Invoices'),
