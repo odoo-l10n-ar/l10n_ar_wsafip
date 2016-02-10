@@ -76,22 +76,21 @@ class account_invoice(models.Model):
             raise ValidationError(
                 _('Must define incoterm if you export products.'))
 
+        if inv.journal_id.get_wsafip_state() == 'unsync':
+            import pdb; pdb.set_trace()
+            raise ValidationError(
+                _('This invoice attemp to create an invoice'
+                  ' with an invalid number.'))
 
         req = self._fex_new_request(journal, invoice_number)
-
         res = conn.server_id.wsfex_autorize(conn.id, [req])
 
-        for k, v in res.iteritems():
-            if 'CAE' in v:
-                self.wsafip_cae = v['CAE']
-                self.wsafip_cae_due = _conv_date(v['CAEFchVto'])
-                self.internal_number = invoice_number
-            else:
-                raise ValidationError(
-                    'Factura %s:\n' % k + '\n'.join(
-                        [u'(%s) %s\n' % e for e in v['Errores']] +
-                        [u'(%s) %s\n' % e for e in v['Observaciones']]
-                    ) + '\n')
+        if res.FEXResultAuth.Cbte_nro != invoice_number:
+            raise ValidationError('Desfazaje de número de facturas.')
+
+        self.wsafip_cae = res.FEXResultAuth.Cae
+        self.wsafip_cae_due = _conv_date(res.FEXResultAuth.Fch_venc_Cae)
+        self.internal_number = invoice_number
 
         return True
 

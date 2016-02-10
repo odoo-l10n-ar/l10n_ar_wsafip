@@ -27,12 +27,10 @@ class wsafip_server(models.Model):
         """
         2.1 Autorizador (FEXAuthorize)
         """
-        print invoice
         response = service.FEXAuthorize(Auth=auth,
                                         Cmp=invoice)
-        check_afip_errors(response)
 
-        if hasattr(response, 'FEXErr'):
+        if hasattr(response, 'FEXErr') and response.FEXErr.ErrCode:
             raise Warning(_('AFIP error. %s') % (response.FEXErr.ErrMsg))
 
         return response
@@ -499,9 +497,6 @@ class wsafip_server(models.Model):
                 ('journal_class_id', '=', journal_class_e.id),
                 ('company_id', '=', company_id),
             ])
-
-            if len(jou)>1:
-                import pdb; pdb.set_trace()
 
             if not jou:
                 new_sequence = self.env['l10n_ar_invoice.new_sequence']
