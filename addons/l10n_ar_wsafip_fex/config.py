@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields, api
-from openerp.tools.translate import _
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -9,9 +8,8 @@ _logger = logging.getLogger(__name__)
 class l10n_ar_wsafip_fex_config(models.TransientModel):
     @api.multi
     def _default_company(self):
-        import pdb; pdb.set_trace()
         users_obj = self.env['res.users']
-        return users_obj.browse(cr, uid, uid, context).company_id.id
+        return users_obj.browse(self.env.uid).company_id.id
 
     def execute(self, cr, uid, ids, context=None):
         """
@@ -20,8 +18,6 @@ class l10n_ar_wsafip_fex_config(models.TransientModel):
         journal_obj = self.pool.get('account.journal')
         afipserver_obj = self.pool.get('wsafip.server')
         sequence_obj = self.pool.get('ir.sequence')
-
-        import pdb; pdb.set_trace()
 
         for ws in self.browse(cr, uid, ids):
             # Tomamos la compania
