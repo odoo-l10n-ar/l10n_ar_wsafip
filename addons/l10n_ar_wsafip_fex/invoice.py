@@ -76,12 +76,6 @@ class account_invoice(models.Model):
             raise ValidationError(
                 _('Must define incoterm if you export products.'))
 
-        if inv.journal_id.get_wsafip_state() == 'unsync':
-            import pdb; pdb.set_trace()
-            raise ValidationError(
-                _('This invoice attemp to create an invoice'
-                  ' with an invalid number.'))
-
         req = self._fex_new_request(journal, invoice_number)
         res = conn.server_id.wsfex_autorize(conn.id, [req])
 
