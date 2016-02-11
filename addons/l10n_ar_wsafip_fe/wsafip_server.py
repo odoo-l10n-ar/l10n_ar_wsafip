@@ -159,8 +159,8 @@ class wsafip_server(models.Model):
         response = service.FEParamGetTiposOpcional(Auth=auth)
 
         # Take list of currency
-        currency_list = [
-            {'afip_code': c.Id,
+        type_list = [
+            {'afip_code': int(c.Id),
                 'name': c.Desc,
                 'active': c.FchHasta in [None, 'NULL']}
             for c in response.ResultGet.OpcionalTipo
@@ -168,7 +168,7 @@ class wsafip_server(models.Model):
 
         update_afip_code(
             self.env['afip.optional_type'],
-            currency_list,
+            type_list,
             can_create=True,
             can_deactivate=False,
             domain=[])
