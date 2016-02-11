@@ -29,6 +29,7 @@
 - !record {model: res.users, id: user_wsafip}:
         name: WSAFIP user
         login: user_wsafip
+        email: user_wsafip@localhost
         lang: es_AR
         company_id: l10n_ar_invoice.com_ivari
         company_ids:
@@ -44,6 +45,7 @@
 - !record {model: res.users, id: admin_wsafip}:
         name: WSAFIP admin
         login: admin_wsafip
+        email: admin_wsafip@localhost
         lang: es_AR
         company_id: l10n_ar_invoice.com_ivari
         company_ids:
