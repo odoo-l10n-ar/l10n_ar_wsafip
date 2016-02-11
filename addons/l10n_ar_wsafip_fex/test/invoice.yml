@@ -1,3 +1,8 @@
+- Set default wsafip sequence to admin_wsafip company before use it.
+- !python {model: res.users, id: l10n_ar_invoice.user_ivari}: |
+    jou = self.env['account.journal'].search([('journal_class_id.code','=','FVE'), ('company_id','=',ref('l10n_ar_invoice.com_ivari'))])
+    jou.wsafip_connection_id.batch_sequence_id.company_id = jou.company_id.id
+
 - Set user
 - !context
     uid: l10n_ar_wsafip.admin_wsafip
