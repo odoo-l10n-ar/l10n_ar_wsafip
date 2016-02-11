@@ -27,7 +27,7 @@
  'license': 'AGPL-3',
  'test': [
      'test/check_journal.yml',
-     'test/query_invoices.yml',
+     #'test/query_invoices.yml',
      'test/invoice.yml',
      ],
  'version': '8.0.1.2',
