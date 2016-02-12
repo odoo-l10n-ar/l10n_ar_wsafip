@@ -9,14 +9,8 @@
      'data/invoice_view.xml',
      'data/invoice_workflow.xml',
      'data/journal_view.xml',
-     # 'data/reports.xml',
-     # 'data/wsafip_fe_config.xml',
-     # 'data/res_config_view.xml',
      'data/wsafip_server_actions.xml',
-     # 'data/report_invoice.xml',
      'data/wsafip.error.csv',
-     # 'wizard/query_invoices_view.xml',
-     # 'wizard/validate_invoices_view.xml',
      'security/wsafip_fex_security.xml',
      'security/ir.model.access.csv'
  ],
@@ -27,10 +21,9 @@
  'license': 'AGPL-3',
  'test': [
      'test/check_journal.yml',
-     #'test/query_invoices.yml',
      'test/invoice.yml',
      ],
- 'version': '8.0.1.2',
+ 'version': '8.0.3.0',
  'website': 'https://launchpad.net/~openerp-l10n-ar-localization',
  'installable': True,
  }

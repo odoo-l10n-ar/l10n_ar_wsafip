@@ -28,7 +28,7 @@
              'test/inv_2iva.yml',
              'test/inv_2prod.yml',
              'test/delayed.yml'],
-    'version': '8.0.2.1',
+    'version': '8.0.3.0',
     'website': 'https://launchpad.net/~openerp-l10n-ar-localization',
     'installable': True,
     }
