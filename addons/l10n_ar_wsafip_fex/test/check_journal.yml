@@ -18,6 +18,7 @@
                         'create_invoices': False,
                 })
                 wiz.execute()
-        assert journal.wsafip_state == 'connected', 'Server is not connected'
+        del journal._cache['wsafip_state']
+        assert journal.wsafip_state in ('connected',), 'Server is not connected'
         assert journal.wsafip_items_generated >= 0, 'Trouble getting number of items'
 
