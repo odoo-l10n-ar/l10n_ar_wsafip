@@ -533,6 +533,11 @@ class wsafip_server(models.Model):
                     j.wsafip_connection_id = con_mod.browse(conn_id).filtered(
                         lambda c: c.partner_id == company.partner_id)
 
+                res = self.wsfex_get_last_request_id(j.wsafip_connection_id.id)
+                last_id = res.FEXResultGet.Id
+                j.wsafip_connection_id.batch_sequence_id.number_next = \
+                    last_id + 1
+
     @api.one
     def wsfex_update(self, conn_id):
         self.wsfex_dummy(conn_id)

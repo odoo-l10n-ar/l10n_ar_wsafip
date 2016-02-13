@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from openerp import models, api, _
 from openerp.exceptions import Warning
-from openerp.addons.l10n_ar_wsafip_fe.wizard.query_invoices import _fch_
+from openerp.addons.l10n_ar_wsafip_fe.models.query_invoices import _fch_
 import logging
 
 _logger = logging.getLogger(__name__)

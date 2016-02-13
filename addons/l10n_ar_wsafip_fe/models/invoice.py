@@ -1,29 +1,11 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields, api, _
 from openerp.exceptions import ValidationError
-import datetime as dt
-import re
 import sys
 import logging
-from openerp.tools import DEFAULT_SERVER_DATE_FORMAT as DATE_FORMAT
-
+from openerp.addons.l10n_ar_wsafip_fe.tools import get_parents, conv_date
 
 _logger = logging.getLogger(__name__)
-
-# Label filter to recover invoice number
-re_label = re.compile(r'%\([^\)]+\)s')
-
-
-def _conv_date(d, f="%Y%m%d"):
-    return dt.datetime.strptime(d, f).date().strftime(DATE_FORMAT)
-
-
-def _get_parents(child, parents=[]):
-    "Functions to list parents names."
-    if child:
-        return parents + [child.name] + _get_parents(child.parent_id)
-    else:
-        return parents
 
 
 class account_invoice(models.Model):
@@ -102,7 +84,7 @@ class account_invoice(models.Model):
         # Ignore IVA for this list
         taxes = [
             tax for tax in self.tax_line
-            if 'IVA' not in _get_parents(tax.tax_code_id)
+            if 'IVA' not in get_parents(tax.tax_code_id)
         ]
 
         # Check if all taxes has tax_code_id
@@ -133,7 +115,7 @@ class account_invoice(models.Model):
         """
         taxes = [
             tax for tax in self.tax_line
-            if 'IVA' in _get_parents(tax.tax_code_id)
+            if 'IVA' in get_parents(tax.tax_code_id)
         ]
 
         return [{'Id': tax.tax_code_id.parent_afip_code,
@@ -161,11 +143,13 @@ class account_invoice(models.Model):
                 if opt_type.apply_rule and
                 safe_eval(opt_type.apply_rule, self.env.context)]
 
-    @api.one
+    @api.multi
     def action_retrieve_cae(self):
         """
         Mensaje de solicitud de CAE
         """
+        self.ensure_one()
+
         inv = self
         journal = inv.journal_id
         conn = journal.wsafip_connection_id
@@ -182,17 +166,7 @@ class account_invoice(models.Model):
         if inv.wsafip_cae and inv.wsafip_cae_due:
             return True
 
-        # Take the last number of the "number".
-        prefix_re = ".*".join([
-            re.escape(w)
-            for w in re_label.split(inv.journal_id.sequence_id.prefix or "")
-        ])
-        suffix_re = ".*".join([
-            re.escape(w)
-            for w in re_label.split(inv.journal_id.sequence_id.suffix or "")
-        ])
-        re_number = re.compile(prefix_re + r"(\d+)" + suffix_re)
-        invoice_number = int(re_number.search(inv.number).group(1) or -1)
+        invoice_number = self.afip_doc_number
 
         if invoice_number < 0:
             raise ValidationError(
@@ -211,8 +185,8 @@ class account_invoice(models.Model):
         for k, v in res.iteritems():
             if 'CAE' in v:
                 self.wsafip_cae = v['CAE']
-                self.wsafip_cae_due = _conv_date(v['CAEFchVto'])
-                self.internal_number = invoice_number
+                self.wsafip_cae_due = conv_date(v['CAEFchVto'])
+                self.internal_number = self.number
             else:
                 raise ValidationError(
                     'Factura %s:\n' % k + '\n'.join(
@@ -228,10 +202,10 @@ class account_invoice(models.Model):
             return d and d.replace('-', '')
 
         def _iva_filter(t):
-            return 'IVA' in _get_parents(t.tax_code_id)
+            return 'IVA' in get_parents(t.tax_code_id)
 
         def _not_iva_filter(t):
-            return 'IVA' not in _get_parents(t.tax_code_id)
+            return 'IVA' not in get_parents(t.tax_code_id)
 
         def _remove_nones(d):
             if (hasattr(d, 'iteritems')):
@@ -307,7 +281,8 @@ class account_invoice(models.Model):
 
         # Solve unsynchronized journals
         for jou in self.mapped('journal_id').filtered(lambda x:
-                                                      x.wsafip_state == 'unsync'):
+                                                      x.wsafip_state
+                                                      == 'unsync'):
             query = self.env['l10n_ar_wsafip_fe.query_invoices'].create({
                 'journal_id': jou.id,
                 'first_invoice_number': jou.sequence_id.number_next,
