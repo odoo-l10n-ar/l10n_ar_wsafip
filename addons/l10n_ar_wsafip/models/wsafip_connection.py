@@ -60,7 +60,7 @@ class wsafip_connection(models.Model):
     @api.multi
     def _get_state(self):
         for conn in self:
-            conn.state = self.get_state()
+            conn.state = conn.get_state()
 
     @api.multi
     @api.model

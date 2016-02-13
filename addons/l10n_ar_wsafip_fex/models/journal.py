@@ -26,7 +26,7 @@ class account_journal(models.Model):
 
         conn = journal.wsafip_connection_id
         if not conn:
-            wsafip_state = 'not_available'
+            return 'not_available'
         elif conn.server_id.code != 'wsfex':
             return super(account_journal, self).get_wsafip_state()
 
@@ -73,7 +73,7 @@ class account_journal(models.Model):
                 journal.point_of_sale,
                 journal.journal_class_id.afip_code)
             _logger.debug("AFIP number of invoices in %s is %s" %
-                            (journal.name, r))
+                          (journal.name, r))
             return r
         else:
             return super(account_journal, self).get_wsafip_items_generated()
