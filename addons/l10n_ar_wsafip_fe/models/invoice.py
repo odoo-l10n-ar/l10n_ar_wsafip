@@ -242,9 +242,9 @@ class account_invoice(models.Model):
                 tax_filter=_iva_filter)['amount_tax'],
             'ImpTrib': inv.compute_all(
                 tax_filter=_not_iva_filter)['amount_tax'] or None,
-            'FchServDesde': _f_date(inv.wsafip_service_start)
+            'FchServDesde': _f_date(inv.afip_service_start)
             if inv.afip_concept != '1' else None,
-            'FchServHasta': _f_date(inv.wsafip_service_end)
+            'FchServHasta': _f_date(inv.afip_service_end)
             if inv.afip_concept != '1' else None,
             'FchVtoPago': _f_date(inv.date_due)
             if inv.afip_concept != '1' else None,
