@@ -112,7 +112,7 @@ class account_invoice(models.Model):
             'Punto_vta': journal.point_of_sale,
             'Cbte_nro': self.afip_doc_number,
             'Tipo_expo': self.afip_concept,
-            'Permiso_existente': 'N',
+            'Permiso_existente': '',
             'Permisos': None,
             'Dst_cmp': self.partner_id.afip_destination_id.afip_code,
             'Cliente': self.partner_id.name,
@@ -123,8 +123,7 @@ class account_invoice(models.Model):
             'Domicilio_cliente': self.partner_id.contact_address,
             'Id_impositivo': self.partner_id.vat,
             'Moneda_Id': self.currency_id.afip_code,
-            'Moneda_ctz': self.currency_id.compute(1,
-                                                   self.company_id.currency_id),
+            'Moneda_ctz': self.company_id.currency_id.compute(1, self.currency_id),
             'Obs_comerciales': self.afip_commercial_obs,
             'Imp_total': self.amount_total,
             'Obs': self.afip_obs,
@@ -135,9 +134,7 @@ class account_invoice(models.Model):
             'Incoterms_Ds': self.afip_incoterm_description
             if self.afip_incoterm_id
             else None,
-            'Idioma_cbte': self.partner_id.lang.afip_code or 2
-            if self.partner_id.lang
-            else 2,
+            'Idioma_cbte': 2,
             'CbtesAsoc': {'CbteAsoc': self.get_related_invoices() or None},
             'Items': [{'Item': {
                 'Pro_codigo': line.product_id.code,

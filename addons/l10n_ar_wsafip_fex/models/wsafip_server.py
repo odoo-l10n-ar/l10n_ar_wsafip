@@ -549,5 +549,6 @@ class wsafip_server(models.Model):
         self.wsfex_update_languages(conn_id)
         self.wsfex_update_incoterms(conn_id)
         self.wsfex_update_journals(conn_id)
+        return True
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
