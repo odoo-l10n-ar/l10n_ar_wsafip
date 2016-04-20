@@ -66,14 +66,14 @@ class account_invoice(models.Model):
         return True
 
     @api.model
-    def get_related_invoices(self):
+    def get_related_invoices(self, ktype="Tipo", ksp="PtoVta", kno="Nro"):
         rel_invs = self.search([
             ('number', '=', self.origin),
             ('state', 'not in', ['draft', 'proforma', 'proforma2', 'cancel'])
         ])
-        return [{'Tipo': rel_inv.journal_id.journal_class_id.afip_code,
-                 'PtoVta': rel_inv.journal_id.point_of_sale,
-                 'Nro': self.number} for rel_inv in rel_invs]
+        return [{ktype: rel_inv.journal_id.journal_class_id.afip_code,
+                 ksp: rel_inv.journal_id.point_of_sale,
+                 kno: rel_inv.afip_doc_number} for rel_inv in rel_invs]
 
     @api.model
     def get_taxes(self):

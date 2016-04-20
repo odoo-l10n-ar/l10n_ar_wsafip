@@ -135,7 +135,7 @@ class account_invoice(models.Model):
             if self.afip_incoterm_id
             else None,
             'Idioma_cbte': 2,
-            'CbtesAsoc': {'CbteAsoc': self.get_related_invoices() or None},
+            'Cmps_asoc': {'Cmp_asoc': self.get_related_invoices(ktype="Cbte_tipo", ksp="Cbte_punto_vta", kno="Cbte_nro") or None},
             'Items': [{'Item': {
                 'Pro_codigo': line.product_id.code,
                 'Pro_ds': line.name,
