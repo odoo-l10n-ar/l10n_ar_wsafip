@@ -18,6 +18,18 @@
 -->
 <openerp>
     <data> 
+        <record id="view_invoice_select" model="ir.ui.view">
+            <field name="model">account.invoice</field>
+            <field name="name">account.invoice.afip.form</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter" />
+            <field name="arch" type="xml">
+                <data>
+                    <field name="journal_id" position="after">
+                        <field name="wsafip_cae"/>
+                    </field>
+                </data>
+            </field>
+        </record>
         <record id="view_invoice_form" model="ir.ui.view">
             <field name="model">account.invoice</field>
             <field name="name">account.invoice.afip.form</field>

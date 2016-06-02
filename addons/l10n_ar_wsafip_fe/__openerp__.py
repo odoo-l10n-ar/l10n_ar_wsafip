@@ -30,5 +30,6 @@
     'version': '8.0.3.0',
     'website': 'https://launchpad.net/~openerp-l10n-ar-localization',
     'installable': True,
+    'external_dependencies': {'python': ['openupgradelib']},
     }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

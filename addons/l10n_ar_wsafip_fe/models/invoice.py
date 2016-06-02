@@ -150,49 +150,44 @@ class account_invoice(models.Model):
         """
         self.ensure_one()
 
-        inv = self
-        journal = inv.journal_id
-        conn = journal.wsafip_connection_id
+        invs = [inv for inv in self
+                # Only process if set to connect to AFIP.
+                if inv.journal_id.wsafip_connection_id
+                # Only if connection server is not type WSFE.
+                and inv.journal_id.wsafip_connection_id.server_id.code == 'wsfe'
+                # Ignore journals with cae.
+                and not inv.wsafip_cae and not inv.wsafip_cae_due
+                # Check if invoice number is ok.
+                and inv.afip_doc_number
+                # Currency must have AFIP code.
+                and inv.currency_id.afip_code
+                ]
 
-        # Only process if set to connect to afip
-        if not conn:
-            return True
+        # Group invoices by journal.
+        invs_group = {journal:
+                      [inv for inv in invs if inv.journal_id == journal]
+                      for journal in set(invs.mapped('journal_id'))}
 
-        # Ignore invoice if connection server is not type WSFE.
-        if conn.server_id.code != 'wsfe':
-            return True
+        # Send validation, one by journal.
+        for jou, invs in invs_group.items():
+            reqs = [self._fe_new_request(jou, inv.afip_doc_number)
+                    for inv in invs]
+            conn = jou.connection_id
+            res = conn.server_id.wsfe_get_cae(conn.id, reqs)
 
-        # Ignore journals with cae
-        if inv.wsafip_cae and inv.wsafip_cae_due:
-            return True
-
-        invoice_number = self.afip_doc_number
-
-        if invoice_number < 0:
-            raise ValidationError(
-                _("Can't find invoice number. "
-                  "Please check the journal sequence prefix and suffix "
-                  "are not breaking the number generator."))
-
-        if not inv.currency_id.afip_code:
-            raise ValidationError(
-                _('Must defined afip_code for the currency.'))
-
-        req = self._fe_new_request(journal, invoice_number)
-
-        res = conn.server_id.wsfe_get_cae(conn.id, [req])
-
-        for k, v in res.iteritems():
-            if 'CAE' in v:
-                self.wsafip_cae = v['CAE']
-                self.wsafip_cae_due = conv_date(v['CAEFchVto'])
-                self.internal_number = self.number
-            else:
-                raise ValidationError(
-                    'Factura %s:\n' % k + '\n'.join(
-                        [u'(%s) %s\n' % e for e in v['Errores']] +
-                        [u'(%s) %s\n' % e for e in v['Observaciones']]
-                    ) + '\n')
+            for k, v in res.iteritems():
+                inv = invs.filtered(lambda i: int(k) == int(i.afip_doc_number))
+                if 'CAE' in v:
+                    inv.wsafip_cae = v['CAE']
+                    inv.wsafip_cae_due = conv_date(v['CAEFchVto'])
+                    inv.internal_number = inv.number
+                else:
+                    inv.message_post(
+                        'Error en la factura %s:\n' % k + '\n'.join(
+                            [u'(%s) %s\n' % e for e in v['Errores']] +
+                            [u'(%s) %s\n' % e for e in v['Observaciones']]
+                        ),
+                    )
 
         return True
 
